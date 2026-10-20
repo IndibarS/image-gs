@@ -1,0 +1,61 @@
+[project]
+name = "image-gs"
+version = "0.1.0"
+description = "Content-adaptive image representation via 2D Gaussians (SIGGRAPH 2025)"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "flip-evaluator",
+    "fused-ssim==1.0.0",
+    "gsplat==1.4.0",
+    "lpips==0.1.4",
+    "matplotlib==3.9.2",
+    "numpy==2.0.2",
+    "opencv-python==4.12.0.88",
+    "pytorch-msssim==1.0.0",
+    "scikit-image==0.24.0",
+    "scipy==1.13.1",
+    "torch==2.4.1",
+    "torchaudio==2.4.1",
+    "torchmetrics==1.5.2",
+    "torchvision==0.19.1",
+    "setuptools>=70",
+    "wheel",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<9",
+    "ruff>=0.8,<1",
+    "pyyaml==6.0",
+]
+
+[tool.uv]
+package = false
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+# Compile extensions against the exact torch installed in the project venv.
+no-build-isolation-package = ["fused-ssim", "gsplat"]
+
+[tool.uv.sources]
+fused-ssim = { git = "https://github.com/rahul-goel/fused-ssim", rev = "a7c48d6dd7ac6dc39a7958c7c4452e0b10418f38" }
+gsplat = { path = "./gsplat", editable = true }
+torch = { index = "pytorch-cu124" }
+torchvision = { index = "pytorch-cu124" }
+torchaudio = { index = "pytorch-cu124" }
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+# These extensions import torch during setup; provide metadata so uv can lock
+# without compiling either CUDA extension during dependency resolution.
+[[tool.uv.dependency-metadata]]
+name = "gsplat"
+version = "1.4.0"
+requires-dist = ["jaxtyping", "rich>=12", "torch"]
+
+[[tool.uv.dependency-metadata]]
+name = "fused-ssim"
+version = "1.0.0"
+requires-dist = ["torch>=2.0.0"]

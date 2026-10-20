@@ -45,33 +45,32 @@
 </div>
 
 ## Setup
-1. Create a dedicated Python environment and install the dependencies
+
+Image-GS uses **[uv](https://docs.astral.sh/uv/)** to manage Python and its dependencies. The supported research environment is **Linux x86_64, Python 3.11.10, PyTorch 2.4.1, and CUDA 12.4**. An NVIDIA GPU, matching driver, and CUDA development toolkit (including `nvcc`) are required to compile and run the custom rasterizer. This project does **not** currently have a CPU fallback.
+
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and verify your CUDA toolchain (`nvcc --version` and `nvidia-smi`).
+2. Clone the repository and install the project dependencies:
+
     ```bash
-    git clone https://github.com/NYU-ICL/image-gs.git
+    git clone https://github.com/IndibarS/image-gs.git
     cd image-gs
-    conda env create -f environment.yml
-    conda activate image-gs
-    pip install git+https://github.com/rahul-goel/fused-ssim/ --no-build-isolation
-    cd gsplat
-    pip install -e ".[dev]"
-    cd ..
+    uv python install 3.11.10
+    uv sync --locked --no-dev
     ```
-2. Download the image and texture datasets from [OneDrive](https://1drv.ms/u/c/3a8968df8a027819/EeshjZJlMtdCmvvmESiN2pABM71EDaoLYmEwuOvecg0tAA?e=GybqBv) and organize the folder structure as follows
+
+    uv installs the pinned CUDA 12.4 PyTorch wheels and builds the local `gsplat` and Git-hosted `fused-ssim` extensions against the project environment. The first installation compiles CUDA code and requires a working C++/CUDA compiler. `uv lock` resolves dependency metadata without compiling CUDA code; a compatible NVIDIA system is still needed for `uv sync` and actual execution.
+
+3. Confirm the CUDA runtime and custom modules:
+
+    ```bash
+    uv run --locked --no-dev python -c "import torch, gsplat, fused_ssim; print(torch.__version__, torch.cuda.is_available())"
     ```
-    image-gs
-    └── media
-        ├── images
-        └── textures
-    ```
-3. (Optional) To run saliency-guided Gaussian position initialization, download the pre-trained [EML-Net](https://github.com/SenJia/EML-NET-Saliency) models ([res_imagenet.pth](https://drive.google.com/open?id=1-a494canr9qWKLdm-DUDMgbGwtlAJz71), [res_places.pth](https://drive.google.com/open?id=18nRz0JSRICLqnLQtAvq01azZAsH0SEzS), [res_decoder.pth](https://drive.google.com/open?id=1vwrkz3eX-AMtXQE08oivGMwS4lKB74sH)) and place them under the `models/emlnet/` folder
-    ```
-    image-gs
-    └── models
-        └── emlnet
-            ├── res_decoder.pth
-            ├── res_imagenet.pth
-            └── res_places.pth
-    ```
+
+4. Download the image and texture datasets from [OneDrive](https://1drv.ms/u/c/3a8968df8a027819/EeshjZJlMtdCmvvmESiN2pABM71EDaoLYmEwuOvecg0tAA?e=GybqBv) and place them under `media/images` and `media/textures`.
+
+5. (Optional) For saliency-guided initialization, download the pretrained [EML-Net](https://github.com/SenJia/EML-NET-Saliency) models ([res_imagenet.pth](https://drive.google.com/open?id=1-a494canr9qWKLdm-DUDMgbGwtlAJz71), [res_places.pth](https://drive.google.com/open?id=18nRz0JSRICLqnLQtAvq01azZAsH0SEzS), [res_decoder.pth](https://drive.google.com/open?id=1vwrkz3eX-AMtXQE08oivGMwS4lKB74sH)) and put them in `models/emlnet/`.
+
+Commands in the examples below use `python main.py`; after uv setup, run them as **`uv run --no-dev python main.py ...`** instead. See [CONTRIBUTING.md](CONTRIBUTING.md) for development, dependency updates, and troubleshooting.
 
 ## Quick Start
 

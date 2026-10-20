@@ -1,0 +1,22 @@
+name: uv configuration checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata-and-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install pinned Python
+        run: uv python install 3.11.10
+      - name: Verify committed lockfile (no CUDA compilation)
+        run: uv lock --check
+      - name: Check source syntax
+        run: uv run --no-project --python 3.11.10 python -m compileall -q main.py model.py utils gsplat/gsplat
