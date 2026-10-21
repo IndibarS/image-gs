@@ -1,0 +1,20 @@
+[2026/10/21 18:04:42] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/edges.png'
+[2026/10/21 18:04:42] ***********************************************
+[2026/10/21 18:04:42] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:04:42] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:04:42] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:04:42] ***********************************************
+[2026/10/21 18:04:42] Image gradient map successfully saved
+[2026/10/21 18:04:42] ***********************************************
+[2026/10/21 18:04:43] Step: 100 | Total: 0.45 s | Render: 0.13 s | Loss: 0.0488, L1: 0.0343, SSIM: 0.0145 | PSNR: 21.16 | SSIM: 0.8540
+[2026/10/21 18:04:43] Step: 200 | Total: 0.89 s | Render: 0.26 s | Loss: 0.0276, L1: 0.0209, SSIM: 0.0067 | PSNR: 24.02 | SSIM: 0.9298
+[2026/10/21 18:04:44] Step: 300 | Total: 1.34 s | Render: 0.39 s | Loss: 0.0236, L1: 0.0185, SSIM: 0.0050 | PSNR: 24.67 | SSIM: 0.9364
+[2026/10/21 18:04:44] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:04:44] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:04:44] Checkpoint 'ckpt_step-300.pt' successfully saved
+[2026/10/21 18:04:44] PSNR: 24.67 | SSIM: 0.9367 | LPIPS: nan | FLIP: 0.1133 | MS-SSIM: nan
+[2026/10/21 18:04:44] ***********************************************
+[2026/10/21 18:04:44] Optimization completed
+[2026/10/21 18:04:44] ***********************************************
+[2026/10/21 18:04:44] Mean scale: -4.6088 (pixel) | 0.2526 (raw)
+[2026/10/21 18:04:44] ***********************************************

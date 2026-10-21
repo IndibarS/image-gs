@@ -1,45 +1,107 @@
 # Contributing to Image-GS
 
-## Supported development environment
-
-This repository uses **uv only** for Python dependency management. Its custom `gsplat` rasterizer and `fused-ssim` extension are compiled code, not interchangeable with CPU-only PyTorch. The currently documented supported target is **Linux x86_64, CPython 3.11.10, NVIDIA GPU, PyTorch 2.4.1 (CUDA 12.4 wheels)** with a compatible NVIDIA driver, CUDA toolkit (`nvcc`), and C++ build toolchain. `uv` does not install the system CUDA compiler.
-
 ## Development setup
+
+Use uv for dependency management. The supported platform is Linux x86_64
+with CPython 3.11.10. Core development does not require NVIDIA hardware:
 
 ```bash
 git clone https://github.com/IndibarS/image-gs.git
 cd image-gs
 uv python install 3.11.10
 uv sync --locked
-uv run python -c "import torch, gsplat, fused_ssim; assert torch.cuda.is_available(); print(torch.__version__)"
+uv run python main.py --help
+uv run python -m pytest -q tests
 ```
 
-`uv sync` installs the `dev` group by default; use `uv sync --no-dev` for execution only. Package resolution (`uv lock`) can run without a GPU because CUDA-extension metadata is declared in `pyproject.toml`, but environment installation and native compilation require the CUDA toolchain. The `gsplat` package is installed editable, so Python edits are visible without reinstalling, but changes to C++/CUDA code still require recompilation.
+Plain `uv sync` includes CPU PyTorch and the default `dev` group, without
+building the CUDA extensions. `uv sync --no-dev` omits development tools.
+The default `device: auto` selects CUDA when the native backend is available,
+otherwise CPU. `--device=cpu` forces the differentiable PyTorch renderer.
+Optimization, quantization, progressive insertion, checkpoints, FLIP, and
+saliency inference work on CPU. Saliency still requires its EMLNet weights.
+CPU training is slower; use a small image and `--disable_prog_optim` for short
+runs so the progressive schedule does not increase `--max_steps`.
 
-## Run an experiment
+## CUDA development and experiments
 
-Place the required datasets under `media/` as described in the [README](README.md), then:
+Install a compatible NVIDIA driver, CUDA 12.4 development toolkit (`nvcc`),
+and C++ compiler. uv installs Python dependencies, not the system toolkit.
 
 ```bash
-uv run python main.py --input_path="images/anime-1_2k.png" --exp_name="test/anime-1_2k" --num_gaussians=10000 --quantize
+uv sync --locked --extra cuda
+uv run --extra cuda python -c "import torch, gsplat, fused_ssim; assert torch.cuda.is_available(); print(torch.__version__)"
+uv run --extra cuda python main.py --input_path="images/anime-1_2k.png" --exp_name="test/anime-1_2k" --num_gaussians=10000 --quantize
 ```
+
+Prepare the datasets described in the README before running an experiment.
+The CUDA extra selects PyTorch 2.4.1 CUDA 12.4 wheels, the local editable
+`gsplat`, and the pinned Git revision of `fused-ssim`. Both extensions build
+against the environment's PyTorch with build isolation disabled. Python
+changes in `gsplat` are immediately visible; native changes need recompilation.
+Always pass `--extra cuda` to `uv run` for CUDA work. Plain `uv sync` switches
+back to core dependencies and removes the optional extensions.
 
 ## Dependencies and lockfile
 
-`pyproject.toml` is the source of truth. Keep the pinned PyTorch/CUDA versions together (`torch`, `torchvision`, `torchaudio`) and do not switch to CPU wheels: native extensions depend on the CUDA build. The local `gsplat` package and a pinned `fused-ssim` Git revision are defined in `[tool.uv.sources]`. Both disable build isolation so they compile against the installed PyTorch; their dependency metadata in `pyproject.toml` must be updated if their upstream packaging changes.
+`pyproject.toml` is the source of truth. Keep torch, torchvision, and torchaudio
+version pins aligned in core dependencies and both extras. CPU wheels come
+from the CPU index; the extra selects the explicit CUDA index. PyYAML is a
+runtime dependency because the CLI reads YAML configuration files.
 
-When updating dependencies, use `uv add ...` or edit `pyproject.toml`, then run `uv lock` and **commit the updated `uv.lock`** with the changes. `uv sync --locked` installs from the committed lockfile, while CI checks that the lockfile matches `pyproject.toml` with `uv lock --check`. Lockfiles pin Python package artifacts, but not system CUDA toolchains or GPU drivers.
+The optional `cpu` extra is equivalent to the default installation. Its declared
+conflict with `cuda` ensures uv resolves the two wheel variants separately;
+do not select both extras or use `--all-extras`. Core package sources are pinned
+to PyPI so the PyTorch index does not shadow their versions.
 
-## Checks and troubleshooting
+After changing dependencies, run `uv lock` and commit `uv.lock` with the change.
+The declared extension metadata lets resolution run without compiling CUDA;
+update that metadata if extension packaging changes. `uv sync --locked`
+enforces the committed lockfile. The lockfile does not pin drivers or toolkits.
+
+## Validation and troubleshooting
 
 ```bash
-uv run python -m compileall -q main.py model.py utils gsplat/gsplat
-uv run python -c "import torch; print(torch.version.cuda, torch.cuda.is_available())"
+uv lock --check
+uv sync --locked --no-build
+uv run --locked python -m pytest -q tests
+uv run --locked python -m compileall -q main.py model.py utils gsplat/gsplat
 ```
 
-- If `nvcc` is not found, install a compatible CUDA development toolkit and ensure `nvcc` is on `PATH`; a working NVIDIA driver alone is not sufficient for extension builds.
-- If the C++/CUDA extensions fail to build, verify toolkit compatibility with the installed PyTorch 2.4.1 CUDA 12.4 wheels and check your compiler setup before changing package versions.
-- If `torch.cuda.is_available()` is false, this implementation cannot run on CPU as-is; changing `device: cuda:0` in `cfgs/default.yaml` will not produce a CPU renderer.
-- The GitHub Actions configuration checks syntax and uv dependency resolution only; hosted CPU runners cannot verify the CUDA extensions or model output.
+CI checks lockfile freshness, syntax, a core install without source builds,
+CPU PyTorch selection, absence of CUDA extensions, imports, CLI help, renderer
+outputs and gradients against a dense reference, and small CPU optimization /
+checkpoint / render runs. Hosted CPU runners cannot verify CUDA compilation
+or CUDA output parity.
+Validate CUDA changes separately on NVIDIA hardware with a reproducible
+input/configuration and before/after outputs where feasible.
 
-Please keep changes to scientific code accompanied by a reproducible input/configuration and, where feasible, before/after outputs.
+If `nvcc` is missing, install the development toolkit; a driver alone is not
+enough. For extension build failures, check toolkit and compiler compatibility
+with PyTorch 2.4.1 CUDA 12.4. Missing CUDA or extensions trigger a logged CPU
+fallback before allocating model tensors. Checkpoint loading maps tensors to
+the selected device. Small-image MS-SSIM/LPIPS and unavailable LPIPS weights
+are recorded as NaN with a warning rather than preventing checkpoint saving.
+The tiled CPU implementation mirrors CUDA projection and blend formulas;
+floating-point rounding and tied top-k selections can differ.
+
+## Adaptive initialization experiments
+
+`utils/adaptive_partition_utils.py` implements CPU-only channel-aware activity,
+capacity-constrained binary partitioning, and region moments. Its output uses
+physical scales and normalized coordinates; `model.py` handles inverse-scale
+storage. Do not change the rasterizer's coordinate or checkpoint conventions to
+accommodate an initializer.
+
+`utils/color_fitting_utils.py` reuses the CPU renderer's contributor selection
+for sparse normalized weights. Always verify weight-matrix reconstruction against
+the active backend before fitting. Keep L2 color-fitting claims separate from
+L1+SSIM Adam results and final quantized metrics. Budgets beyond available pixels
+and unsupported unnormalized direct fitting fail explicitly.
+
+Run `uv run python -m pytest -q tests` for partition coverage/determinism,
+chromatic edges, geometry, sparse fitting, short/zero-step schedules, and checkpoint
+round trips. Use `scripts/benchmark_adaptive.py` and `benchmarks/README.md` for
+isolated mode comparisons. Report total encoding time, precision, input size,
+seed, final quality, and memory—not just iteration count. The retained tiny CPU
+smoke results do not establish quality-equivalent speedups on real images.

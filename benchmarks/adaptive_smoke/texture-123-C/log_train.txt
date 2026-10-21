@@ -1,0 +1,19 @@
+[2026/10/21 17:52:36] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/inputs/texture.png'
+[2026/10/21 17:52:36] ***********************************************
+[2026/10/21 17:52:36] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 17:52:36] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 17:52:36] Compression rate: 2.82x | 35.42%
+[2026/10/21 17:52:36] ***********************************************
+[2026/10/21 17:52:36] Initialized all 17 Gaussians from Laplacian partitions
+[2026/10/21 17:52:36] Step: 100 | Total: 0.42 s | Render: 0.12 s | Loss: 0.5455, L1: 0.4654, SSIM: 0.0801 | PSNR: 4.50 | SSIM: 0.2013
+[2026/10/21 17:52:37] Step: 200 | Total: 0.84 s | Render: 0.25 s | Loss: 0.5232, L1: 0.4453, SSIM: 0.0780 | PSNR: 4.38 | SSIM: 0.2213
+[2026/10/21 17:52:37] Step: 300 | Total: 1.27 s | Render: 0.37 s | Loss: 0.5059, L1: 0.4291, SSIM: 0.0768 | PSNR: 4.24 | SSIM: 0.2333
+[2026/10/21 17:52:37] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 17:52:37] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 17:52:37] Checkpoint 'ckpt_step-300.pt' successfully saved
+[2026/10/21 17:52:37] PSNR: 4.24 | SSIM: 0.2333 | LPIPS: nan | FLIP: 0.8310 | MS-SSIM: nan
+[2026/10/21 17:52:37] ***********************************************
+[2026/10/21 17:52:37] Optimization completed
+[2026/10/21 17:52:37] ***********************************************
+[2026/10/21 17:52:37] Mean scale: 1.2868 (pixel) | 1.1141 (raw)
+[2026/10/21 17:52:37] ***********************************************

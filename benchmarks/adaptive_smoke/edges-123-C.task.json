@@ -1,0 +1,1 @@
+{"image": "/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/inputs/edges.png", "run_dir": "/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/edges-123-C", "mode": "C", "seed": 123, "gaussians": 17, "bits": 16, "device": "cpu", "threads": 2}

@@ -1,0 +1,116 @@
+[2026/10/21 18:09:59] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/texture.png'
+[2026/10/21 18:09:59] ***********************************************
+[2026/10/21 18:09:59] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:09:59] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:09:59] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:09:59] ***********************************************
+[2026/10/21 18:09:59] Initialized all 17 Gaussians from Laplacian partitions
+[2026/10/21 18:10:00] Step: 100 | Total: 0.40 s | Render: 0.12 s | Loss: 0.5455, L1: 0.4654, SSIM: 0.0801 | PSNR: 4.50 | SSIM: 0.2013
+[2026/10/21 18:10:00] Step: 200 | Total: 0.83 s | Render: 0.25 s | Loss: 0.5232, L1: 0.4453, SSIM: 0.0780 | PSNR: 4.38 | SSIM: 0.2213
+[2026/10/21 18:10:01] Step: 300 | Total: 1.42 s | Render: 0.42 s | Loss: 0.5059, L1: 0.4291, SSIM: 0.0768 | PSNR: 4.24 | SSIM: 0.2333
+[2026/10/21 18:10:01] Step: 400 | Total: 2.00 s | Render: 0.59 s | Loss: 0.4976, L1: 0.4214, SSIM: 0.0762 | PSNR: 4.14 | SSIM: 0.2381
+[2026/10/21 18:10:02] Step: 500 | Total: 2.55 s | Render: 0.75 s | Loss: 0.4926, L1: 0.4169, SSIM: 0.0757 | PSNR: 4.08 | SSIM: 0.2432
+[2026/10/21 18:10:03] Step: 600 | Total: 3.12 s | Render: 0.91 s | Loss: 0.4912, L1: 0.4154, SSIM: 0.0758 | PSNR: 4.04 | SSIM: 0.2428
+[2026/10/21 18:10:03] Step: 700 | Total: 3.67 s | Render: 1.07 s | Loss: 0.4905, L1: 0.4147, SSIM: 0.0758 | PSNR: 4.04 | SSIM: 0.2422
+[2026/10/21 18:10:04] Step: 800 | Total: 4.22 s | Render: 1.23 s | Loss: 0.4899, L1: 0.4142, SSIM: 0.0758 | PSNR: 4.06 | SSIM: 0.2428
+[2026/10/21 18:10:04] Step: 900 | Total: 4.80 s | Render: 1.40 s | Loss: 0.4895, L1: 0.4138, SSIM: 0.0757 | PSNR: 4.07 | SSIM: 0.2435
+[2026/10/21 18:10:05] Step: 1000 | Total: 5.41 s | Render: 1.58 s | Loss: 0.4889, L1: 0.4133, SSIM: 0.0756 | PSNR: 4.07 | SSIM: 0.2443
+[2026/10/21 18:10:06] Step: 1100 | Total: 5.99 s | Render: 1.74 s | Loss: 0.4877, L1: 0.4123, SSIM: 0.0754 | PSNR: 4.09 | SSIM: 0.2467
+[2026/10/21 18:10:06] Step: 1200 | Total: 6.55 s | Render: 1.91 s | Loss: 0.4871, L1: 0.4119, SSIM: 0.0752 | PSNR: 4.11 | SSIM: 0.2479
+[2026/10/21 18:10:07] Step: 1300 | Total: 7.12 s | Render: 2.07 s | Loss: 0.4868, L1: 0.4116, SSIM: 0.0752 | PSNR: 4.10 | SSIM: 0.2480
+[2026/10/21 18:10:07] Step: 1400 | Total: 7.67 s | Render: 2.23 s | Loss: 0.4867, L1: 0.4115, SSIM: 0.0752 | PSNR: 4.10 | SSIM: 0.2481
+[2026/10/21 18:10:08] Step: 1500 | Total: 8.22 s | Render: 2.39 s | Loss: 0.4866, L1: 0.4114, SSIM: 0.0752 | PSNR: 4.10 | SSIM: 0.2484
+[2026/10/21 18:10:09] Step: 1600 | Total: 8.82 s | Render: 2.56 s | Loss: 0.4864, L1: 0.4113, SSIM: 0.0752 | PSNR: 4.09 | SSIM: 0.2485
+[2026/10/21 18:10:09] Step: 1700 | Total: 9.40 s | Render: 2.73 s | Loss: 0.4863, L1: 0.4112, SSIM: 0.0752 | PSNR: 4.08 | SSIM: 0.2484
+[2026/10/21 18:10:10] Step: 1800 | Total: 9.97 s | Render: 2.89 s | Loss: 0.4862, L1: 0.4111, SSIM: 0.0751 | PSNR: 4.08 | SSIM: 0.2488
+[2026/10/21 18:10:11] Step: 1900 | Total: 10.54 s | Render: 3.06 s | Loss: 0.4844, L1: 0.4097, SSIM: 0.0748 | PSNR: 4.10 | SSIM: 0.2525
+[2026/10/21 18:10:11] Step: 2000 | Total: 11.10 s | Render: 3.22 s | Loss: 0.4842, L1: 0.4096, SSIM: 0.0746 | PSNR: 4.12 | SSIM: 0.2539
+[2026/10/21 18:10:12] Step: 2100 | Total: 11.67 s | Render: 3.38 s | Loss: 0.4841, L1: 0.4096, SSIM: 0.0745 | PSNR: 4.13 | SSIM: 0.2549
+[2026/10/21 18:10:12] Step: 2200 | Total: 12.26 s | Render: 3.55 s | Loss: 0.4840, L1: 0.4095, SSIM: 0.0745 | PSNR: 4.13 | SSIM: 0.2552
+[2026/10/21 18:10:13] Step: 2300 | Total: 12.87 s | Render: 3.73 s | Loss: 0.4839, L1: 0.4095, SSIM: 0.0744 | PSNR: 4.14 | SSIM: 0.2559
+[2026/10/21 18:10:14] Step: 2400 | Total: 13.45 s | Render: 3.90 s | Loss: 0.4839, L1: 0.4095, SSIM: 0.0744 | PSNR: 4.14 | SSIM: 0.2560
+[2026/10/21 18:10:14] Step: 2500 | Total: 14.00 s | Render: 4.06 s | Loss: 0.4838, L1: 0.4094, SSIM: 0.0744 | PSNR: 4.14 | SSIM: 0.2559
+[2026/10/21 18:10:15] Step: 2600 | Total: 14.55 s | Render: 4.22 s | Loss: 0.4838, L1: 0.4094, SSIM: 0.0744 | PSNR: 4.14 | SSIM: 0.2561
+[2026/10/21 18:10:15] Step: 2700 | Total: 15.11 s | Render: 4.38 s | Loss: 0.4838, L1: 0.4094, SSIM: 0.0744 | PSNR: 4.14 | SSIM: 0.2562
+[2026/10/21 18:10:16] Step: 2800 | Total: 15.67 s | Render: 4.54 s | Loss: 0.4838, L1: 0.4094, SSIM: 0.0744 | PSNR: 4.14 | SSIM: 0.2564
+[2026/10/21 18:10:17] Step: 2900 | Total: 16.28 s | Render: 4.71 s | Loss: 0.4838, L1: 0.4095, SSIM: 0.0744 | PSNR: 4.15 | SSIM: 0.2566
+[2026/10/21 18:10:17] Step: 3000 | Total: 16.85 s | Render: 4.88 s | Loss: 0.4838, L1: 0.4094, SSIM: 0.0744 | PSNR: 4.14 | SSIM: 0.2565
+[2026/10/21 18:10:18] Step: 3100 | Total: 17.40 s | Render: 5.04 s | Loss: 0.4838, L1: 0.4095, SSIM: 0.0743 | PSNR: 4.15 | SSIM: 0.2570
+[2026/10/21 18:10:19] Step: 3200 | Total: 17.97 s | Render: 5.20 s | Loss: 0.4838, L1: 0.4096, SSIM: 0.0742 | PSNR: 4.17 | SSIM: 0.2579
+[2026/10/21 18:10:19] Step: 3300 | Total: 18.52 s | Render: 5.36 s | Loss: 0.4838, L1: 0.4096, SSIM: 0.0741 | PSNR: 4.17 | SSIM: 0.2588
+[2026/10/21 18:10:20] Step: 3400 | Total: 19.08 s | Render: 5.52 s | Loss: 0.4837, L1: 0.4097, SSIM: 0.0740 | PSNR: 4.19 | SSIM: 0.2603
+[2026/10/21 18:10:20] Step: 3500 | Total: 19.65 s | Render: 5.69 s | Loss: 0.4837, L1: 0.4097, SSIM: 0.0740 | PSNR: 4.19 | SSIM: 0.2606
+[2026/10/21 18:10:21] Step: 3600 | Total: 20.22 s | Render: 5.85 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:22] Step: 3700 | Total: 20.78 s | Render: 6.01 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:22] Step: 3800 | Total: 21.33 s | Render: 6.17 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:23] Step: 3900 | Total: 21.89 s | Render: 6.33 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:23] Step: 4000 | Total: 22.44 s | Render: 6.49 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:24] Step: 4100 | Total: 22.98 s | Render: 6.65 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:25] Step: 4200 | Total: 23.57 s | Render: 6.82 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2611
+[2026/10/21 18:10:25] Step: 4300 | Total: 24.16 s | Render: 6.99 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2612
+[2026/10/21 18:10:26] Step: 4400 | Total: 24.72 s | Render: 7.15 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:26] Step: 4500 | Total: 25.27 s | Render: 7.31 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:27] Step: 4600 | Total: 25.82 s | Render: 7.47 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:28] Step: 4700 | Total: 26.37 s | Render: 7.62 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:29] Step: 4800 | Total: 27.26 s | Render: 7.88 s | Loss: 0.4839, L1: 0.4100, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:29] Step: 4900 | Total: 28.13 s | Render: 8.14 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:30] Step: 5000 | Total: 28.90 s | Render: 8.36 s | Loss: 0.4838, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:31] Step: 5100 | Total: 29.46 s | Render: 8.52 s | Loss: 0.4844, L1: 0.4104, SSIM: 0.0740 | PSNR: 4.19 | SSIM: 0.2607
+[2026/10/21 18:10:31] Step: 5200 | Total: 30.01 s | Render: 8.68 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2607
+[2026/10/21 18:10:32] Step: 5300 | Total: 30.55 s | Render: 8.84 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:33] Step: 5400 | Total: 31.10 s | Render: 8.99 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:33] Step: 5500 | Total: 31.66 s | Render: 9.16 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:34] Step: 5600 | Total: 32.21 s | Render: 9.32 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:34] Step: 5700 | Total: 32.76 s | Render: 9.47 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:35] Step: 5800 | Total: 33.30 s | Render: 9.63 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:36] Step: 5900 | Total: 33.89 s | Render: 9.80 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:36] Step: 6000 | Total: 34.44 s | Render: 9.96 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:10:37] Step: 6100 | Total: 34.97 s | Render: 10.11 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:37] Step: 6200 | Total: 35.51 s | Render: 10.26 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:38] Step: 6300 | Total: 36.04 s | Render: 10.42 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:39] Step: 6400 | Total: 36.58 s | Render: 10.57 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:10:39] Step: 6500 | Total: 37.12 s | Render: 10.73 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:10:40] Step: 6600 | Total: 37.66 s | Render: 10.88 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:40] Step: 6700 | Total: 38.20 s | Render: 11.04 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:41] Step: 6800 | Total: 38.75 s | Render: 11.20 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:41] Step: 6900 | Total: 39.28 s | Render: 11.35 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:42] Step: 7000 | Total: 39.83 s | Render: 11.51 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:43] Step: 7100 | Total: 40.36 s | Render: 11.66 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:43] Step: 7200 | Total: 40.90 s | Render: 11.82 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:44] Step: 7300 | Total: 41.44 s | Render: 11.97 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:44] Step: 7400 | Total: 41.97 s | Render: 12.13 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:10:45] Step: 7500 | Total: 42.52 s | Render: 12.28 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:45] Step: 7600 | Total: 43.05 s | Render: 12.44 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:46] Step: 7700 | Total: 43.60 s | Render: 12.59 s | Loss: 0.4838, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:47] Step: 7800 | Total: 44.14 s | Render: 12.75 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:47] Step: 7900 | Total: 44.68 s | Render: 12.91 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:48] Step: 8000 | Total: 45.22 s | Render: 13.06 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:48] Step: 8100 | Total: 45.75 s | Render: 13.22 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:49] Step: 8200 | Total: 46.30 s | Render: 13.37 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:10:50] Step: 8300 | Total: 46.84 s | Render: 13.53 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2612
+[2026/10/21 18:10:50] Step: 8400 | Total: 47.39 s | Render: 13.69 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:51] Step: 8500 | Total: 47.95 s | Render: 13.85 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:51] Step: 8600 | Total: 48.50 s | Render: 14.01 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:52] Step: 8700 | Total: 49.05 s | Render: 14.17 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:10:53] Step: 8800 | Total: 49.62 s | Render: 14.33 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:53] Step: 8900 | Total: 50.17 s | Render: 14.49 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:54] Step: 9000 | Total: 50.73 s | Render: 14.65 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2609
+[2026/10/21 18:10:54] Step: 9100 | Total: 51.28 s | Render: 14.81 s | Loss: 0.4838, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:55] Step: 9200 | Total: 51.83 s | Render: 14.97 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:10:55] Step: 9300 | Total: 52.37 s | Render: 15.12 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:56] Step: 9400 | Total: 52.93 s | Render: 15.29 s | Loss: 0.4838, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:57] Step: 9500 | Total: 53.51 s | Render: 15.45 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:57] Step: 9600 | Total: 54.06 s | Render: 15.61 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:10:58] Step: 9700 | Total: 54.61 s | Render: 15.77 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2610
+[2026/10/21 18:10:58] Step: 9800 | Total: 55.15 s | Render: 15.93 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2608
+[2026/10/21 18:10:59] Step: 9900 | Total: 55.68 s | Render: 16.08 s | Loss: 0.4838, L1: 0.4099, SSIM: 0.0739 | PSNR: 4.20 | SSIM: 0.2612
+[2026/10/21 18:11:00] Step: 10000 | Total: 56.23 s | Render: 16.24 s | Loss: 0.4837, L1: 0.4098, SSIM: 0.0739 | PSNR: 4.19 | SSIM: 0.2611
+[2026/10/21 18:11:00] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:11:00] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:11:00] Checkpoint 'ckpt_step-10000.pt' successfully saved
+[2026/10/21 18:11:00] PSNR: 4.19 | SSIM: 0.2611 | LPIPS: nan | FLIP: 0.8196 | MS-SSIM: nan
+[2026/10/21 18:11:00] ***********************************************
+[2026/10/21 18:11:00] Optimization completed
+[2026/10/21 18:11:00] ***********************************************
+[2026/10/21 18:11:00] Mean scale: 6.7200 (pixel) | 1.7107 (raw)
+[2026/10/21 18:11:00] ***********************************************

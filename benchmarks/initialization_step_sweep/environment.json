@@ -1,0 +1,47 @@
+{
+  "arguments": {
+    "images": null,
+    "size": 16,
+    "gaussians": 17,
+    "bits": 16,
+    "seeds": [
+      123
+    ],
+    "modes": [
+      "baseline",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "device": "cpu",
+    "threads": 2,
+    "output": "benchmarks/initialization_step_sweep",
+    "step_sweep": true,
+    "worker": null
+  },
+  "platform": "Linux-7.2.10+deb14-amd64-x86_64-with-glibc2.43",
+  "cpu": "",
+  "logical_cpu_count": 8,
+  "timing": "encoding wall includes model construction, fitting, Adam, evaluation and image/checkpoint I/O; process wall additionally includes interpreter imports",
+  "precision": "all modes use identical quantization and the existing save/evaluate path",
+  "payload": "parameter_payload_bytes is theoretical packed parameter bits only; checkpoint_file_bytes is the actual torch training checkpoint",
+  "baseline": "Full-budget gradient versus full-budget Laplacian; progressive allocation and early stopping disabled for both; no direct color fitting",
+  "source_sha256": {
+    "model.py": "d25afb81a3d0f7a9505b1584cae99e1c522afe98742c825d7b60a42e2bf523ec",
+    "main.py": "f1ad4a37ed5f7022f91cee689ce526d9b0f199ee86e17f16e84e43b1e769293d",
+    "cfgs/default.yaml": "b01bbe529cf9e3de8365d20ac2e706bd8a7425e53fe234f098571c7547ada38d",
+    "utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "utils/adaptive_partition_utils.py": "8c707adfb3276b7d35f16d81ea6af3d07bd013159515ebaa4d7eedf08c4db43c",
+    "utils/color_fitting_utils.py": "e30cd75b46967845bed83438c723d72838d7e6b075a323bdb087e1bb3d36c3bb",
+    "utils/cpu_backend.py": "0a5eb77472683d453bd44affea8b4406ba3e386a7859bd30ab4231e85d013e9d",
+    "utils/flip.py": "26d9fdb725ce86c28e8f8206c04ea28ab6df49bcb5039b85eba91412bd64d0af",
+    "utils/image_utils.py": "0fac917a913f8676ebddfb371de017bb7e34e97c7a02fe2128a6f14d53360c44",
+    "utils/misc_utils.py": "f5d29502d0a7f8188a345ffb68d72a6fdff87f5d4c747eac349b69082607ba11",
+    "utils/quantization_utils.py": "dcdaab00dd925d4efe27a0a0689f2feb7c6fc38628e24101be856160c3b2abfc",
+    "utils/saliency/decoder.py": "7a8ad3f4f3d4a71c9bb5cea1296d51e208e25b3cc136e92405629eb725a08374",
+    "utils/saliency/resnet.py": "73d47a18af7c2379e528345c1fd2d7eb7590382602f0ffa4e516b5b5650f9e0b",
+    "utils/saliency_utils.py": "23af76398d3088b6f00ae1ec2bc389e3bafb4ec47578b4c02a4741228840f8f1"
+  }
+}

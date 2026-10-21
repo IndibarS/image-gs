@@ -1,0 +1,18 @@
+[2026/10/21 18:01:38] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/gradient.png'
+[2026/10/21 18:01:38] ***********************************************
+[2026/10/21 18:01:38] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:01:38] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:01:38] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:01:38] ***********************************************
+[2026/10/21 18:01:38] Image gradient map successfully saved
+[2026/10/21 18:01:38] ***********************************************
+[2026/10/21 18:01:38] Step: 100 | Total: 0.39 s | Render: 0.11 s | Loss: 0.0115, L1: 0.0108, SSIM: 0.0007 | PSNR: 36.62 | SSIM: 0.9930
+[2026/10/21 18:01:38] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:01:38] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:01:38] Checkpoint 'ckpt_step-100.pt' successfully saved
+[2026/10/21 18:01:38] PSNR: 36.62 | SSIM: 0.9930 | LPIPS: nan | FLIP: 0.0879 | MS-SSIM: nan
+[2026/10/21 18:01:38] ***********************************************
+[2026/10/21 18:01:38] Optimization completed
+[2026/10/21 18:01:38] ***********************************************
+[2026/10/21 18:01:38] Mean scale: 4.0836 (pixel) | 0.2559 (raw)
+[2026/10/21 18:01:38] ***********************************************

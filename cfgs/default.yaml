@@ -1,5 +1,5 @@
 seed:                  123
-device:                "cuda:0"
+device:                "auto" # CUDA when available, otherwise CPU
 # Evaluation
 eval:                  False # Render the optimized Image-GS representation
 render_height:         2048 # Image height for rendering (aspect ratio is maintained)
@@ -33,7 +33,7 @@ disable_topk_norm:     False # Disable top-K normalization
 disable_inverse_scale: False # Disable inverse Gaussian scale optimization
 ckpt_file:             ""
 disable_color_init:    False
-init_mode:             "gradient" # Gaussian position initialization mode, valid values include "gradient", "saliency", and "random"
+init_mode:             "gradient" # Gaussian position initialization mode, valid values include "gradient", "saliency", "random", and "laplacian"
 init_random_ratio:     0.3 # Ratio of Gaussians with randomly initialized position
 smap_filter_size:      20 # Gaussian filter size for smoothing saliency maps
 # Loss functions
@@ -57,3 +57,18 @@ initial_ratio:         0.5
 add_steps:             500
 add_times:             4
 post_min_steps:        3000
+# Adaptive full-budget initialization (existing modes retain progressive defaults)
+laplacian_smoothing:    0.8
+activity_epsilon:       0.05 # relative to mean-normalized derivative activity
+activity_alpha:         0.0 # gradient weight; zero selects pure Laplacian
+activity_beta:          1.0 # Laplacian weight
+partition_strategy:     "balanced" # balanced or longest
+partition_scale_factor: 1.5
+partition_min_scale:    0.35
+partition_visualize:    False
+color_fit_sweeps:       0 # optional fixed-geometry L2 coordinate descent
+color_fit_epsilon:      1.0e-10
+color_fit_max_entries:  20000000 # explicit bound on sparse H*W*K storage
+skip_adam:              False # initializes full budget even in existing modes
+residual_refine_count:  0 # optional local replacements, fixed total count
+residual_refine_sweeps: 2

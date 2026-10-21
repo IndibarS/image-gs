@@ -15,9 +15,9 @@ def get_smap(image, path, filter_size=15):
     if image.shape[0] != 3:
         raise ValueError("Saliency prediction only supports RGB images")
     sod_res = (480, 640)
-    imagenet_model = resnet.resnet50(f"{path}/emlnet/res_imagenet.pth").cuda().eval()
-    places_model = resnet.resnet50(f"{path}/emlnet/res_places.pth").cuda().eval()
-    decoder_model = decoder.build_decoder(f"{path}/emlnet/res_decoder.pth", sod_res, 5, 5).cuda().eval()
+    imagenet_model = resnet.resnet50(f"{path}/emlnet/res_imagenet.pth").to(image.device).eval()
+    places_model = resnet.resnet50(f"{path}/emlnet/res_places.pth").to(image.device).eval()
+    decoder_model = decoder.build_decoder(f"{path}/emlnet/res_decoder.pth", sod_res, 5, 5).to(image.device).eval()
     image_sod = resize(image, sod_res).unsqueeze(0)
     with torch.no_grad():
         imagenet_feat = imagenet_model(image_sod, decode=True)
@@ -28,7 +28,7 @@ def get_smap(image, path, filter_size=15):
     def post_process(smap):
         smap = filters.gaussian(smap, filter_size)
         smap -= smap.min()
-        smap /= smap.max()
+        smap /= max(float(smap.max()), 1e-12)
         return smap
 
     return post_process(smap.numpy()).astype(np.float32)

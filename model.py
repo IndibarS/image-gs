@@ -1,24 +1,21 @@
+import json
 import logging
 import math
 import os
 import sys
 import warnings
 from time import perf_counter
+from functools import partial
+from urllib.error import URLError
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from fused_ssim import fused_ssim
 from lpips import LPIPS
 from pytorch_msssim import MS_SSIM
 from torchvision.transforms.functional import gaussian_blur
 
-from gsplat import (
-    project_gaussians_2d_scale_rot,
-    rasterize_gaussians_no_tiles,
-    rasterize_gaussians_sum,
-)
 from utils.flip import LDRFLIPLoss
 from utils.image_utils import (
     compute_image_gradients,
@@ -43,10 +40,18 @@ warnings.filterwarnings("ignore", category=FutureWarning, module="lpips")
 
 class GaussianSplatting2D(nn.Module):
     def __init__(self, args):
+        self.encoding_started = perf_counter()
+        self.run_args = args
+        if args.max_steps < 0 or args.num_gaussians < 1:
+            raise ValueError("max_steps must be nonnegative and num_gaussians positive")
+        if getattr(args, 'color_fit_sweeps', 0) < 0 or not 0 <= getattr(args, 'residual_refine_count', 0) <= 32:
+            raise ValueError("color_fit_sweeps must be nonnegative; residual_refine_count must be 0..32")
+        if args.init_mode not in ('random', 'gradient', 'saliency', 'laplacian'):
+            raise ValueError("Unknown initialization mode")
         super(GaussianSplatting2D, self).__init__()
+        self._load_backend(args)
         self.evaluate = args.eval
         set_random_seed(seed=args.seed)
-        self.device = args.device
         self.dtype = torch.float32
         self._init_logging(args)
         self._init_target(args)
@@ -60,6 +65,56 @@ class GaussianSplatting2D(nn.Module):
             self._load_model()
         else:
             self._init_pos_scale_feat(args)
+        self._sync_device()
+        self.initialization_seconds = perf_counter() - self.encoding_started
+        self.direct_fitting_seconds = 0.0
+        self.residual_refinement_seconds = 0.0
+        self.adam_seconds = 0.0
+        self.fit_history = []
+
+    def _load_backend(self, args):
+        requested = torch.device("cuda:0" if args.device == "auto" else args.device)
+        if requested.type not in ("cpu", "cuda"):
+            warnings.warn(f"Device {requested} is unsupported; using CPU.")
+        use_cuda = requested.type == "cuda" and torch.cuda.is_available()
+        if use_cuda and requested.index is not None:
+            use_cuda = requested.index < torch.cuda.device_count()
+        if use_cuda:
+            try:
+                from fused_ssim import fused_ssim
+                from gsplat import (
+                    project_gaussians_2d_scale_rot,
+                    rasterize_gaussians_no_tiles,
+                    rasterize_gaussians_sum,
+                )
+                # gsplat may import without loading its compiled extension.
+                from gsplat.cuda._backend import _C
+                if _C is None:
+                    raise ImportError("gsplat CUDA extension is unavailable")
+            except (ImportError, OSError, RuntimeError) as exc:
+                warnings.warn(f"CUDA backend unavailable ({exc}); using CPU.")
+                use_cuda = False
+        if not use_cuda:
+            from utils.cpu_backend import (
+                ssim as fused_ssim,
+                project_gaussians_2d_scale_rot,
+                rasterize_gaussians_no_tiles,
+                rasterize_gaussians_sum,
+            )
+            rasterize_gaussians_sum = partial(rasterize_gaussians_sum, topk=args.topk)
+            rasterize_gaussians_no_tiles = partial(rasterize_gaussians_no_tiles, topk=args.topk)
+            if requested.type != "cpu":
+                warnings.warn("Using CPU rendering and optimization; large images and Gaussian counts will be slow.")
+        elif args.topk != 10:
+            raise ValueError("The CUDA kernels require --topk=10")
+        if args.topk < 1:
+            raise ValueError("topk must be positive")
+        self.device = str(requested) if use_cuda else "cpu"
+        args.device = self.device
+        self._fused_ssim = fused_ssim
+        self._project_gaussians_2d_scale_rot = project_gaussians_2d_scale_rot
+        self._rasterize_gaussians_no_tiles = rasterize_gaussians_no_tiles
+        self._rasterize_gaussians_sum = rasterize_gaussians_sum
 
     def _init_logging(self, args):
         self.log_dir = args.log_dir
@@ -108,12 +163,15 @@ class GaussianSplatting2D(nn.Module):
         if self.downsample:
             self.downsample_ratio = float(args.downsample_ratio)
         self.block_h, self.block_w = 16, 16  # Warning: Must match hardcoded value in CUDA kernel, modify with caution
-        self._load_target_images(path=os.path.join(args.data_root, args.input_path))
+        input_path = os.path.join(args.data_root, args.input_path)
+        if not os.path.exists(input_path) and os.path.exists(args.input_path):
+            input_path = args.input_path
+        self._load_target_images(path=input_path)
         if self.downsample:
             self.gt_images_upsampled = self.gt_images
             self.img_h_upsampled, self.img_w_upsampled = self.img_h, self.img_w
             self.tile_bounds_upsampled = self.tile_bounds
-            self._load_target_images(path=os.path.join(args.data_root, args.input_path), downsample_ratio=self.downsample_ratio)
+            self._load_target_images(path=input_path, downsample_ratio=self.downsample_ratio)
             if not self.evaluate:
                 path = f"{self.log_dir}/gt_upsample-{self.downsample_ratio:.1f}_res-{self.img_h_upsampled:d}x{self.img_w_upsampled:d}"
                 self._separate_and_save_images(images=self.gt_images_upsampled, channels=self.input_channels, path=path)
@@ -145,7 +203,8 @@ class GaussianSplatting2D(nn.Module):
     def _init_gaussians(self, args):
         self.num_gaussians = args.num_gaussians
         self.total_num_gaussians = args.num_gaussians
-        self.disable_prog_optim = args.disable_prog_optim
+        self.disable_prog_optim = (args.disable_prog_optim or args.init_mode == 'laplacian'
+                                   or getattr(args, 'skip_adam', False) or args.max_steps == 0)
         if not self.disable_prog_optim and not self.evaluate:
             self.initial_ratio = args.initial_ratio
             self.add_times = args.add_times
@@ -201,7 +260,7 @@ class GaussianSplatting2D(nn.Module):
     def _init_optimization(self, args):
         self.disable_tiles = args.disable_tiles
         self.start_step = 1
-        self.max_steps = args.max_steps
+        self.max_steps = 0 if getattr(args, "skip_adam", False) else args.max_steps
         self.pos_lr = args.pos_lr
         self.scale_lr = args.scale_lr
         self.rot_lr = args.rot_lr
@@ -220,6 +279,24 @@ class GaussianSplatting2D(nn.Module):
     def _init_pos_scale_feat(self, args):
         self.init_mode = args.init_mode
         self.init_random_ratio = args.init_random_ratio
+        if self.init_mode == 'laplacian':
+            from utils.adaptive_partition_utils import initialize_gaussians, save_partition_preview
+            image = self.gt_images.detach().cpu().numpy()
+            result = initialize_gaussians(
+                image, self.num_gaussians, args.laplacian_smoothing, args.activity_epsilon,
+                args.activity_alpha, args.activity_beta, args.partition_strategy,
+                args.partition_scale_factor, args.partition_min_scale)
+            self.partition_regions = result.regions
+            with torch.no_grad():
+                self.xy.copy_(torch.from_numpy(result.positions).to(self.xy))
+                physical_scale = torch.from_numpy(result.scales).to(self.scale)
+                self.scale.copy_(physical_scale if self.disable_inverse_scale else physical_scale.reciprocal())
+                self.rot.copy_(torch.from_numpy(result.rotations).to(self.rot))
+                self.feat.copy_(torch.from_numpy(result.features).to(self.feat))
+            if args.partition_visualize:
+                save_partition_preview(image, result.regions, f"{self.log_dir}/partition.png")
+            self.worklog.info(f"Initialized all {self.num_gaussians} Gaussians from Laplacian partitions")
+            return
         self.pixel_xy = get_grid(h=self.img_h, w=self.img_w).to(dtype=self.dtype, device=self.device).reshape(-1, 2)
         with torch.no_grad():
             # Position
@@ -231,7 +308,7 @@ class GaussianSplatting2D(nn.Module):
                 self._compute_smap(path="models")
                 self.xy.copy_(self._sample_pos(prob=self.saliency))
             else:
-                selected = np.random.choice(self.num_pixels, self.num_gaussians, replace=False, p=None)
+                selected = np.random.choice(self.num_pixels, self.num_gaussians, replace=self.num_gaussians > self.num_pixels, p=None)
                 self.xy.copy_(self.pixel_xy.detach().clone()[selected])
             # Scale
             self.scale.fill_(self.init_scale if self.disable_inverse_scale else 1.0/self.init_scale)
@@ -241,24 +318,24 @@ class GaussianSplatting2D(nn.Module):
 
     def _sample_pos(self, prob):
         num_random = round(self.init_random_ratio*self.num_gaussians)
-        selected_random = np.random.choice(self.num_pixels, num_random, replace=False, p=None)
-        selected_other = np.random.choice(self.num_pixels, self.num_gaussians-num_random, replace=False, p=prob)
+        selected_random = np.random.choice(self.num_pixels, num_random, replace=self.num_gaussians > self.num_pixels, p=None)
+        selected_other = np.random.choice(self.num_pixels, self.num_gaussians-num_random, replace=(self.num_gaussians-num_random) > np.count_nonzero(prob), p=prob)
         return torch.cat([self.pixel_xy.detach().clone()[selected_random], self.pixel_xy.detach().clone()[selected_other]], dim=0)
 
     def _compute_gmap(self):
         gy, gx = compute_image_gradients(np.power(self.gt_images.detach().cpu().clone().numpy(), 1.0/self.gamma))
         g_norm = np.hypot(gy, gx).astype(np.float32)
-        g_norm = g_norm / g_norm.max()
+        g_norm = g_norm / max(float(g_norm.max()), 1e-12)
         save_image(g_norm, f"{self.log_dir}/gmap_res-{self.img_h:d}x{self.img_w:d}.{self.save_image_format}")
         g_norm = np.power(g_norm.reshape(-1), 2.0)
-        self.image_gradients = g_norm / g_norm.sum()
+        self.image_gradients = g_norm / g_norm.sum() if g_norm.sum() > 0 else np.full_like(g_norm, 1 / g_norm.size)
         self.worklog.info("Image gradient map successfully saved")
         self.worklog.info("***********************************************")
 
     def _compute_smap(self, path):
         smap = get_smap(torch.pow(self.gt_images.detach().clone(), 1.0/self.gamma), path, self.smap_filter_size)
         save_image(smap, f"{self.log_dir}/smap_res-{self.img_h:d}x{self.img_w:d}.{self.save_image_format}")
-        self.saliency = (smap / smap.sum()).reshape(-1)
+        self.saliency = (smap / smap.sum()).reshape(-1) if smap.sum() > 0 else np.full(smap.size, 1 / smap.size)
         self.worklog.info("Saliency map successfully saved")
         self.worklog.info("***********************************************")
 
@@ -277,7 +354,7 @@ class GaussianSplatting2D(nn.Module):
             if latest_step == -1:
                 raise FileNotFoundError(f"No checkpoint found in '{self.ckpt_dir}'")
             ckpt_path = os.path.join(self.ckpt_dir, f"ckpt_step-{latest_step:d}.pt")
-        checkpoint = torch.load(ckpt_path, weights_only=False)
+        checkpoint = torch.load(ckpt_path, map_location=self.device, weights_only=False)
         self.load_state_dict(checkpoint['state_dict'])
         self.optimizer.load_state_dict(checkpoint['optim_state_dict'])
         self.start_step = checkpoint["step"]+1
@@ -288,6 +365,7 @@ class GaussianSplatting2D(nn.Module):
         if self.quantize:
             self._quantize()
         psnr, ssim = self._evaluate(log=False, upsample=False)
+        self.psnr_curr, self.ssim_curr = psnr, ssim
         self._evaluate_extra()
         ckpt_data = {"step": self.step,
                      "psnr": psnr,
@@ -353,15 +431,15 @@ class GaussianSplatting2D(nn.Module):
             xy, scale, rot, feat = ste_quantize(xy, self.pos_bits), ste_quantize(
                 scale, self.scale_bits), ste_quantize(rot, self.rot_bits), ste_quantize(feat, self.feat_bits)
         begin = perf_counter()
-        tmp = project_gaussians_2d_scale_rot(xy, scale, rot, img_h, img_w, tile_bounds)
+        tmp = self._project_gaussians_2d_scale_rot(xy, scale, rot, img_h, img_w, tile_bounds)
         xy, radii, conics, num_tiles_hit = tmp
         if not self.disable_tiles:
             enable_topk_norm = not self.disable_topk_norm
             tmp = xy, radii, conics, num_tiles_hit, feat, img_h, img_w, self.block_h, self.block_w, enable_topk_norm
-            out_image = rasterize_gaussians_sum(*tmp)
+            out_image = self._rasterize_gaussians_sum(*tmp)
         else:
             tmp = xy, conics, feat, img_h, img_w
-            out_image = rasterize_gaussians_no_tiles(*tmp)
+            out_image = self._rasterize_gaussians_no_tiles(*tmp)
         render_time = perf_counter() - begin
         if benchmark:
             return render_time
@@ -383,15 +461,15 @@ class GaussianSplatting2D(nn.Module):
             xy, scale, rot, feat = ste_quantize(xy, self.pos_bits), ste_quantize(
                 scale, self.scale_bits), ste_quantize(rot, self.rot_bits), ste_quantize(feat, self.feat_bits)
         feat = self.vis_feat * feat.norm(dim=-1, keepdim=True)
-        tmp = project_gaussians_2d_scale_rot(xy, scale, rot, img_h, img_w, tile_bounds)
+        tmp = self._project_gaussians_2d_scale_rot(xy, scale, rot, img_h, img_w, tile_bounds)
         xy, radii, conics, num_tiles_hit = tmp
         if not self.disable_tiles:
             enable_topk_norm = not self.disable_topk_norm
             tmp = xy, radii, conics, num_tiles_hit, feat, img_h, img_w, self.block_h, self.block_w, enable_topk_norm
-            out_image = rasterize_gaussians_sum(*tmp)
+            out_image = self._rasterize_gaussians_sum(*tmp)
         else:
             tmp = xy, conics, feat, img_h, img_w
-            out_image = rasterize_gaussians_no_tiles(*tmp)
+            out_image = self._rasterize_gaussians_no_tiles(*tmp)
         out_image = out_image.view(-1, img_h, img_w, self.feat_dim).permute(0, 3, 1, 2).contiguous()
         return out_image.squeeze(dim=0)
 
@@ -404,10 +482,27 @@ class GaussianSplatting2D(nn.Module):
 
         self.step = 0
         with torch.no_grad():
+            if getattr(self.run_args, 'color_fit_sweeps', 0) or getattr(self.run_args, 'residual_refine_count', 0):
+                if self.quantize:
+                    self._quantize()
+                self._sync_device()
+                started = perf_counter()
+                if self.run_args.color_fit_sweeps:
+                    self._fit_colors(self.run_args.color_fit_sweeps)
+                self._sync_device()
+                self.direct_fitting_seconds = perf_counter() - started
+                started = perf_counter()
+                if self.run_args.residual_refine_count:
+                    self._refine_residual()
+                self._sync_device()
+                self.residual_refinement_seconds = perf_counter() - started
+        with torch.no_grad():
             self._log_images(log_final=False, plot_gaussians=self.vis_gaussians)
         for step in range(self.start_step, self.max_steps+1):
             self.step = step
             self.optimizer.zero_grad()
+            self._sync_device()
+            adam_started = perf_counter()
             # Rendering
             images, render_time = self.forward(self.img_h, self.img_w, self.tile_bounds)
             self.render_time_accum += render_time
@@ -416,6 +511,8 @@ class GaussianSplatting2D(nn.Module):
             self._get_total_loss(images)
             self.total_loss.backward()
             self.optimizer.step()
+            self._sync_device()
+            self.adam_seconds += perf_counter() - adam_started
             self.total_time_accum += (perf_counter() - begin + render_time)
             # Logging
             terminate = False
@@ -439,6 +536,7 @@ class GaussianSplatting2D(nn.Module):
         self.worklog.info("***********************************************")
         self.worklog.info(f"Mean scale: {self._get_scale().mean().item():.4f} (pixel) | {self.scale.mean().item():.4f} (raw)")
         self.worklog.info("***********************************************")
+        self._write_encoding_metrics()
         return self.psnr_curr, self.ssim_curr
 
     def _get_total_loss(self, images):
@@ -454,7 +552,7 @@ class GaussianSplatting2D(nn.Module):
         else:
             self.l2_loss = None
         if self.ssim_loss_ratio > 1e-7:
-            self.ssim_loss = self.ssim_loss_ratio * (1 - fused_ssim(images.unsqueeze(0), self.gt_images.unsqueeze(0)))
+            self.ssim_loss = self.ssim_loss_ratio * (1 - self._fused_ssim(images.unsqueeze(0), self.gt_images.unsqueeze(0)))
             self.total_loss += self.ssim_loss
         else:
             self.ssim_loss = None
@@ -465,7 +563,7 @@ class GaussianSplatting2D(nn.Module):
         images = torch.pow(torch.clamp(self._render_images(upsample=upsample), 0.0, 1.0), 1.0/self.gamma)
         gt_images = torch.pow(self.gt_images_upsampled if upsample else self.gt_images, 1.0/self.gamma)
         psnr = get_psnr(images, gt_images).item()
-        ssim = fused_ssim(images.unsqueeze(0), gt_images.unsqueeze(0)).item()
+        ssim = self._fused_ssim(images.unsqueeze(0), gt_images.unsqueeze(0)).item()
         if log:
             self.psnr_curr, self.ssim_curr = psnr, ssim
             loss_results = f"Loss: {self.total_loss.item():.4f}"
@@ -480,11 +578,23 @@ class GaussianSplatting2D(nn.Module):
         images = torch.pow(torch.clamp(self._render_images(upsample=False), 0.0, 1.0), 1.0/self.gamma)[None, ...]
         gt_images = torch.pow(self.gt_images, 1.0/self.gamma)[None, ...]
         msssim_metric = MS_SSIM(data_range=1.0, size_average=True, channel=self.feat_dim).to(device=self.device).eval()
-        self.msssim_final = msssim_metric(images, gt_images).item()
-        lpips_metric = LPIPS(net='alex').to(device=self.device).eval()
+        self.msssim_final = float("nan")
+        if min(images.shape[-2:]) > 160:
+            self.msssim_final = msssim_metric(images, gt_images).item()
+        else:
+            self.worklog.warning("MS-SSIM requires both image dimensions >160; recording NaN.")
+
         flip_metric = LDRFLIPLoss().to(device=self.device).eval()
         num_channels = 1 if self.feat_dim < 3 else 3
-        self.lpips_final = lpips_metric(images[:, :num_channels], gt_images[:, :num_channels]).item()
+        self.lpips_final = float("nan")
+        if min(images.shape[-2:]) >= 64:
+            try:
+                lpips_metric = LPIPS(net='alex').to(device=self.device).eval()
+                self.lpips_final = lpips_metric(images[:, :num_channels], gt_images[:, :num_channels]).item()
+            except (OSError, URLError) as exc:
+                self.worklog.warning(f"LPIPS pretrained weights unavailable; recording NaN: {exc}")
+        else:
+            self.worklog.warning("LPIPS skipped for images smaller than 64 pixels; recording NaN.")
         if self.feat_dim >= 3:
             self.flip_final = flip_metric(images[:, :3], gt_images[:, :3]).item()
 
@@ -558,8 +668,8 @@ class GaussianSplatting2D(nn.Module):
             gt_images = gaussian_blur(img=gt_images, kernel_size=kernel_size)
         diff_map = (gt_images - images).detach().clone()
         error_map = torch.pow(torch.abs(diff_map).mean(dim=0).reshape(-1), 2.0)
-        sample_prob = (error_map / error_map.sum()).cpu().numpy()
-        selected = np.random.choice(self.num_pixels, add_num, replace=False, p=sample_prob)
+        sample_prob = (error_map / error_map.sum()).cpu().numpy() if error_map.sum() > 0 else np.full(self.num_pixels, 1 / self.num_pixels)
+        selected = np.random.choice(self.num_pixels, add_num, replace=add_num > np.count_nonzero(sample_prob), p=sample_prob)
         # New Gaussians
         new_xy = self.pixel_xy.detach().clone()[selected]
         new_scale = torch.ones(add_num, 2, dtype=self.dtype, device=self.device)
@@ -600,3 +710,104 @@ class GaussianSplatting2D(nn.Module):
                                            {'params': self.feat, 'lr': self.feat_lr}])
         self.worklog.info(f"Step: {self.step:d} | Adding {add_num:d} Gaussians ({self.num_gaussians-add_num:d} -> {self.num_gaussians:d})")
         self.worklog.info("***********************************************")
+
+    def _sync_device(self):
+        if self.device.startswith('cuda'):
+            torch.cuda.synchronize(self.device)
+
+    @torch.no_grad()
+    def _fitting_weights(self):
+        from utils.color_fitting_utils import renderer_weights
+        if not self.disable_tiles and self.disable_topk_norm:
+            raise ValueError("Direct color fitting currently requires top-K normalization")
+        xy, scale, rot = self.xy, self._get_scale(), self.rot
+        if self.quantize:
+            xy, scale, rot = (ste_quantize(xy, self.pos_bits), ste_quantize(scale, self.scale_bits),
+                              ste_quantize(rot, self.rot_bits))
+        projected, radius, conic, _ = self._project_gaussians_2d_scale_rot(
+            xy, scale, rot, self.img_h, self.img_w, self.tile_bounds)
+        weights = renderer_weights(projected, radius, conic, self.img_h, self.img_w,
+                                   self.topk, not self.disable_tiles, self.run_args.color_fit_max_entries)
+        colors = ste_quantize(self.feat, self.feat_bits) if self.quantize else self.feat
+        expected = weights @ colors.detach().cpu().numpy()
+        actual = self._render_images().permute(1,2,0).reshape(-1,self.feat_dim).cpu().numpy()
+        if not np.allclose(expected, actual, rtol=2e-4, atol=2e-5):
+            raise RuntimeError("Sparse weights disagree with active renderer (possibly CUDA top-K ties). "
+                               "Use --device=cpu for exact reference color fitting.")
+        return weights
+
+    @torch.no_grad()
+    def _fit_colors(self, sweeps, weights=None, indices=None):
+        from utils.color_fitting_utils import fit_colors
+        if weights is None:
+            weights = self._fitting_weights()
+        target = self.gt_images.permute(1,2,0).reshape(-1,self.feat_dim).cpu().numpy()
+        colors, history = fit_colors(weights, target, self.feat.detach().cpu().numpy(), sweeps,
+                                     self.run_args.color_fit_epsilon, indices)
+        self.feat.copy_(torch.from_numpy(colors).to(self.feat))
+        self.fit_history.append(history)
+        self.worklog.info(f"Fixed-geometry unquantized L2 color fit: MSE {history[0]:.6g} -> {history[-1]:.6g}")
+        return weights
+
+    @torch.no_grad()
+    def _refine_residual(self):
+        """One bounded batch of low-impact replacements; accept only rendered MSE improvement.
+
+        Rebuild membership once, then fit only columns sharing affected pixels.
+        Global top-K membership must be recomputed after geometry changes.
+        """
+        args = self.run_args
+        weights = self._fitting_weights()
+        target = self.gt_images.permute(1,2,0).reshape(-1,self.feat_dim).cpu().numpy()
+        rendered = self._render_images().permute(1,2,0).reshape(-1,self.feat_dim).cpu().numpy()
+        error = ((target-rendered)**2).mean(1)
+        before = float(error.mean())
+        old = [p.detach().clone() for p in (self.xy,self.scale,self.rot,self.feat)]
+        energy = np.asarray(weights.power(2).sum(axis=0)).ravel()
+        energy *= np.square(self.feat.cpu().numpy()).sum(1)
+        count = min(args.residual_refine_count,self.num_gaussians)
+        replace = np.argsort(energy,kind='stable')[:count]
+        score = error.reshape(self.img_h,self.img_w).copy()
+        for i in replace:
+            y,x = np.unravel_index(np.argmax(score),score.shape)
+            self.xy[i].copy_(self.xy.new_tensor([x/self.img_w,y/self.img_h]))
+            physical = max(args.partition_min_scale,min(self.init_scale,np.sqrt(self.num_pixels/self.num_gaussians)/2))
+            self.scale[i].fill_(physical if self.disable_inverse_scale else 1/physical)
+            self.rot[i].zero_()
+            self.feat[i].copy_(self.gt_images[:,y,x])
+            radius = max(1,round(physical))
+            score[max(0,y-radius):y+radius+1,max(0,x-radius):x+radius+1] = -1
+        if self.quantize:
+            self._quantize()
+        updated = self._fitting_weights()
+        affected = np.unique(np.concatenate([weights[:,replace].nonzero()[0],updated[:,replace].nonzero()[0]]))
+        nearby = np.unique(np.concatenate([updated[affected].indices,replace]))
+        self._fit_colors(args.residual_refine_sweeps,updated,nearby)
+        after = float(F.mse_loss(self._render_images(),self.gt_images).item())
+        accepted = after < before
+        if not accepted:
+            for param,saved in zip((self.xy,self.scale,self.rot,self.feat),old):
+                param.copy_(saved)
+        self.residual_refinement = dict(before_mse=before, candidate_mse=after, accepted=accepted,
+                                        replacements=count, fitted_colors=len(nearby))
+        self.worklog.info(f"Residual refinement: {self.residual_refinement}")
+
+    def _write_encoding_metrics(self):
+        self._sync_device()
+        checkpoint = os.path.join(self.ckpt_dir,f"ckpt_step-{self.step}.pt")
+        metrics = dict(initialization_seconds=self.initialization_seconds,
+                       direct_fitting_seconds=self.direct_fitting_seconds,
+                       residual_refinement_seconds=self.residual_refinement_seconds,
+                       adam_seconds=self.adam_seconds,
+                       encoding_wall_seconds=perf_counter()-self.encoding_started,
+                       adam_steps=self.step, gaussians=self.num_gaussians, device=self.device,
+                       psnr=self.psnr_curr, ssim=self.ssim_curr, lpips=self.lpips_final,
+                       flip=self.flip_final, msssim=self.msssim_final,
+                       parameter_payload_bytes=self.num_bytes,
+                       checkpoint_file_bytes=os.path.getsize(checkpoint),
+                       color_fit_mse_history=self.fit_history,
+                       residual_refinement=getattr(self,'residual_refinement',None))
+        # JSON null denotes unavailable metrics; do not emit nonstandard NaN.
+        metrics = {k: (None if isinstance(v,float) and not math.isfinite(v) else v) for k,v in metrics.items()}
+        with open(os.path.join(self.log_dir,'encoding_metrics.json'),'w') as handle:
+            json.dump(metrics,handle,indent=2,allow_nan=False)

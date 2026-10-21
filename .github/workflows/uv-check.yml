@@ -20,3 +20,17 @@ jobs:
         run: uv lock --check
       - name: Check source syntax
         run: uv run --no-project --python 3.11.10 python -m compileall -q main.py model.py utils gsplat/gsplat
+      - name: Install core dependencies without compiling extensions
+        run: uv sync --locked --no-build
+      - name: Verify CPU installation
+        run: |
+          uv run --locked python - <<'PYCODE'
+          import importlib.metadata as metadata
+          import torch
+          assert torch.version.cuda is None
+          installed = {dist.metadata["Name"].lower() for dist in metadata.distributions()}
+          assert not {"gsplat", "fused-ssim"} & installed
+          assert not any(name.startswith("nvidia-") for name in installed)
+          PYCODE
+      - name: Test core imports, CLI, and utilities
+        run: uv run --locked python -m pytest -q tests

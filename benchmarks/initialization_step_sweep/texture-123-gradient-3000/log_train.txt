@@ -1,0 +1,47 @@
+[2026/10/21 18:08:05] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/texture.png'
+[2026/10/21 18:08:05] ***********************************************
+[2026/10/21 18:08:05] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:08:05] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:08:05] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:08:05] ***********************************************
+[2026/10/21 18:08:05] Image gradient map successfully saved
+[2026/10/21 18:08:05] ***********************************************
+[2026/10/21 18:08:05] Step: 100 | Total: 0.42 s | Render: 0.12 s | Loss: 0.5637, L1: 0.4816, SSIM: 0.0821 | PSNR: 4.98 | SSIM: 0.1791
+[2026/10/21 18:08:06] Step: 200 | Total: 0.88 s | Render: 0.25 s | Loss: 0.5595, L1: 0.4784, SSIM: 0.0811 | PSNR: 4.89 | SSIM: 0.1890
+[2026/10/21 18:08:06] Step: 300 | Total: 1.34 s | Render: 0.39 s | Loss: 0.5557, L1: 0.4760, SSIM: 0.0797 | PSNR: 4.90 | SSIM: 0.2026
+[2026/10/21 18:08:07] Step: 400 | Total: 1.78 s | Render: 0.52 s | Loss: 0.5511, L1: 0.4727, SSIM: 0.0785 | PSNR: 4.98 | SSIM: 0.2154
+[2026/10/21 18:08:07] Step: 500 | Total: 2.22 s | Render: 0.65 s | Loss: 0.5434, L1: 0.4660, SSIM: 0.0774 | PSNR: 5.18 | SSIM: 0.2289
+[2026/10/21 18:08:08] Step: 600 | Total: 2.66 s | Render: 0.78 s | Loss: 0.5349, L1: 0.4584, SSIM: 0.0765 | PSNR: 5.29 | SSIM: 0.2394
+[2026/10/21 18:08:08] Step: 700 | Total: 3.10 s | Render: 0.91 s | Loss: 0.5314, L1: 0.4552, SSIM: 0.0761 | PSNR: 5.31 | SSIM: 0.2425
+[2026/10/21 18:08:09] Step: 800 | Total: 3.55 s | Render: 1.04 s | Loss: 0.5271, L1: 0.4514, SSIM: 0.0756 | PSNR: 5.33 | SSIM: 0.2469
+[2026/10/21 18:08:09] Step: 900 | Total: 3.99 s | Render: 1.17 s | Loss: 0.5162, L1: 0.4425, SSIM: 0.0737 | PSNR: 5.39 | SSIM: 0.2654
+[2026/10/21 18:08:10] Step: 1000 | Total: 4.44 s | Render: 1.30 s | Loss: 0.5055, L1: 0.4329, SSIM: 0.0727 | PSNR: 5.42 | SSIM: 0.2768
+[2026/10/21 18:08:10] Step: 1100 | Total: 4.90 s | Render: 1.43 s | Loss: 0.5005, L1: 0.4286, SSIM: 0.0719 | PSNR: 5.46 | SSIM: 0.2854
+[2026/10/21 18:08:11] Step: 1200 | Total: 5.35 s | Render: 1.56 s | Loss: 0.4946, L1: 0.4239, SSIM: 0.0707 | PSNR: 5.51 | SSIM: 0.2950
+[2026/10/21 18:08:11] Step: 1300 | Total: 5.80 s | Render: 1.70 s | Loss: 0.4919, L1: 0.4217, SSIM: 0.0702 | PSNR: 5.51 | SSIM: 0.3002
+[2026/10/21 18:08:12] Step: 1400 | Total: 6.24 s | Render: 1.83 s | Loss: 0.4900, L1: 0.4201, SSIM: 0.0699 | PSNR: 5.52 | SSIM: 0.3019
+[2026/10/21 18:08:12] Step: 1500 | Total: 6.69 s | Render: 1.96 s | Loss: 0.4890, L1: 0.4192, SSIM: 0.0698 | PSNR: 5.53 | SSIM: 0.3026
+[2026/10/21 18:08:13] Step: 1600 | Total: 7.14 s | Render: 2.09 s | Loss: 0.4885, L1: 0.4188, SSIM: 0.0697 | PSNR: 5.51 | SSIM: 0.3028
+[2026/10/21 18:08:13] Step: 1700 | Total: 7.58 s | Render: 2.22 s | Loss: 0.4879, L1: 0.4182, SSIM: 0.0696 | PSNR: 5.54 | SSIM: 0.3034
+[2026/10/21 18:08:14] Step: 1800 | Total: 8.04 s | Render: 2.35 s | Loss: 0.4870, L1: 0.4174, SSIM: 0.0696 | PSNR: 5.52 | SSIM: 0.3038
+[2026/10/21 18:08:14] Step: 1900 | Total: 8.61 s | Render: 2.52 s | Loss: 0.4864, L1: 0.4169, SSIM: 0.0695 | PSNR: 5.52 | SSIM: 0.3044
+[2026/10/21 18:08:15] Step: 2000 | Total: 9.06 s | Render: 2.65 s | Loss: 0.4857, L1: 0.4163, SSIM: 0.0694 | PSNR: 5.54 | SSIM: 0.3051
+[2026/10/21 18:08:15] Step: 2100 | Total: 9.50 s | Render: 2.78 s | Loss: 0.4853, L1: 0.4158, SSIM: 0.0694 | PSNR: 5.54 | SSIM: 0.3055
+[2026/10/21 18:08:16] Step: 2200 | Total: 9.94 s | Render: 2.91 s | Loss: 0.4848, L1: 0.4155, SSIM: 0.0693 | PSNR: 5.55 | SSIM: 0.3061
+[2026/10/21 18:08:16] Step: 2300 | Total: 10.37 s | Render: 3.03 s | Loss: 0.4845, L1: 0.4152, SSIM: 0.0693 | PSNR: 5.55 | SSIM: 0.3077
+[2026/10/21 18:08:17] Step: 2400 | Total: 10.80 s | Render: 3.16 s | Loss: 0.4840, L1: 0.4147, SSIM: 0.0693 | PSNR: 5.57 | SSIM: 0.3101
+[2026/10/21 18:08:17] Step: 2500 | Total: 11.22 s | Render: 3.28 s | Loss: 0.4835, L1: 0.4143, SSIM: 0.0692 | PSNR: 5.58 | SSIM: 0.3120
+[2026/10/21 18:08:18] Step: 2600 | Total: 11.66 s | Render: 3.41 s | Loss: 0.4829, L1: 0.4136, SSIM: 0.0692 | PSNR: 5.59 | SSIM: 0.3152
+[2026/10/21 18:08:18] Step: 2700 | Total: 12.11 s | Render: 3.54 s | Loss: 0.4820, L1: 0.4128, SSIM: 0.0692 | PSNR: 5.62 | SSIM: 0.3186
+[2026/10/21 18:08:19] Step: 2800 | Total: 12.57 s | Render: 3.68 s | Loss: 0.4813, L1: 0.4121, SSIM: 0.0691 | PSNR: 5.61 | SSIM: 0.3200
+[2026/10/21 18:08:19] Step: 2900 | Total: 13.04 s | Render: 3.82 s | Loss: 0.4807, L1: 0.4117, SSIM: 0.0690 | PSNR: 5.62 | SSIM: 0.3195
+[2026/10/21 18:08:20] Step: 3000 | Total: 13.54 s | Render: 3.96 s | Loss: 0.4807, L1: 0.4118, SSIM: 0.0689 | PSNR: 5.62 | SSIM: 0.3189
+[2026/10/21 18:08:20] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:08:20] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:08:20] Checkpoint 'ckpt_step-3000.pt' successfully saved
+[2026/10/21 18:08:20] PSNR: 5.62 | SSIM: 0.3189 | LPIPS: nan | FLIP: 0.6241 | MS-SSIM: nan
+[2026/10/21 18:08:20] ***********************************************
+[2026/10/21 18:08:20] Optimization completed
+[2026/10/21 18:08:20] ***********************************************
+[2026/10/21 18:08:20] Mean scale: 5.7590 (pixel) | 0.6011 (raw)
+[2026/10/21 18:08:20] ***********************************************

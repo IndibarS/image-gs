@@ -1,0 +1,1 @@
+{"image": "/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/inputs/gradient.png", "run_dir": "/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/gradient-123-D", "mode": "D", "seed": 123, "gaussians": 17, "bits": 16, "device": "cpu", "threads": 2}

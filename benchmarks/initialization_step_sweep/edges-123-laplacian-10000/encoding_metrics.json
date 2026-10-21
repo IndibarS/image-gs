@@ -1,0 +1,23 @@
+{
+  "initialization_seconds": 0.011225941000702733,
+  "direct_fitting_seconds": 0.0,
+  "residual_refinement_seconds": 0.0,
+  "adam_seconds": 51.03096805993664,
+  "encoding_wall_seconds": 51.800172686000224,
+  "adam_steps": 10000,
+  "gaussians": 17,
+  "device": "cpu",
+  "psnr": 68.08220672607422,
+  "ssim": 0.9997990727424622,
+  "lpips": null,
+  "flip": 0.011015968397259712,
+  "msssim": null,
+  "parameter_payload_bytes": 272.0,
+  "checkpoint_file_bytes": 7755,
+  "color_fit_mse_history": [],
+  "residual_refinement": null,
+  "peak_rss_mib": 354.88671875,
+  "peak_cuda_allocated_mib": null,
+  "torch_version": "2.4.1+cpu",
+  "python_version": "3.11.10"
+}

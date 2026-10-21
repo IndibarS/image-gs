@@ -1,0 +1,26 @@
+[2026/10/21 18:06:19] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/edges.png'
+[2026/10/21 18:06:19] ***********************************************
+[2026/10/21 18:06:19] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:06:19] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:06:19] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:06:19] ***********************************************
+[2026/10/21 18:06:19] Initialized all 17 Gaussians from Laplacian partitions
+[2026/10/21 18:06:20] Step: 100 | Total: 0.49 s | Render: 0.14 s | Loss: 0.0016, L1: 0.0015, SSIM: 0.0001 | PSNR: 49.22 | SSIM: 0.9991
+[2026/10/21 18:06:20] Step: 200 | Total: 0.96 s | Render: 0.28 s | Loss: 0.0011, L1: 0.0010, SSIM: 0.0001 | PSNR: 53.18 | SSIM: 0.9993
+[2026/10/21 18:06:21] Step: 300 | Total: 1.42 s | Render: 0.41 s | Loss: 0.0008, L1: 0.0008, SSIM: 0.0000 | PSNR: 55.95 | SSIM: 0.9996
+[2026/10/21 18:06:21] Step: 400 | Total: 1.87 s | Render: 0.54 s | Loss: 0.0007, L1: 0.0007, SSIM: 0.0001 | PSNR: 57.71 | SSIM: 0.9997
+[2026/10/21 18:06:21] Step: 500 | Total: 2.31 s | Render: 0.67 s | Loss: 0.0006, L1: 0.0006, SSIM: 0.0000 | PSNR: 59.49 | SSIM: 0.9996
+[2026/10/21 18:06:22] Step: 600 | Total: 2.75 s | Render: 0.80 s | Loss: 0.0006, L1: 0.0006, SSIM: 0.0000 | PSNR: 61.39 | SSIM: 0.9997
+[2026/10/21 18:06:22] Step: 700 | Total: 3.22 s | Render: 0.94 s | Loss: 0.0005, L1: 0.0005, SSIM: 0.0000 | PSNR: 63.24 | SSIM: 0.9997
+[2026/10/21 18:06:23] Step: 800 | Total: 3.69 s | Render: 1.07 s | Loss: 0.0005, L1: 0.0004, SSIM: 0.0000 | PSNR: 63.53 | SSIM: 0.9997
+[2026/10/21 18:06:23] Step: 900 | Total: 4.16 s | Render: 1.21 s | Loss: 0.0005, L1: 0.0004, SSIM: 0.0000 | PSNR: 64.41 | SSIM: 0.9996
+[2026/10/21 18:06:24] Step: 1000 | Total: 4.60 s | Render: 1.34 s | Loss: 0.0004, L1: 0.0004, SSIM: 0.0000 | PSNR: 66.08 | SSIM: 0.9998
+[2026/10/21 18:06:24] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:06:24] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:06:24] Checkpoint 'ckpt_step-1000.pt' successfully saved
+[2026/10/21 18:06:24] PSNR: 66.08 | SSIM: 0.9998 | LPIPS: nan | FLIP: 0.0096 | MS-SSIM: nan
+[2026/10/21 18:06:24] ***********************************************
+[2026/10/21 18:06:24] Optimization completed
+[2026/10/21 18:06:24] ***********************************************
+[2026/10/21 18:06:24] Mean scale: 1.5107 (pixel) | 1.0016 (raw)
+[2026/10/21 18:06:24] ***********************************************

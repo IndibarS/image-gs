@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import cv2
 import flip_evaluator
@@ -18,7 +19,7 @@ font_manager.fontManager.addfont(FONT_PATH)
 FONT_PROP = font_manager.FontProperties(fname=FONT_PATH).get_name()
 
 plt.rcParams['font.family'] = FONT_PROP
-plt.rcParams['text.usetex'] = True
+plt.rcParams['text.usetex'] = shutil.which('latex') is not None
 matplotlib.rcParams['font.size'] = 16
 matplotlib.rcParams['axes.titlesize'] = 16
 matplotlib.rcParams['figure.titlesize'] = 16
@@ -37,7 +38,7 @@ GAUSSIAN_COLOR = "#80ed99"
 def get_psnr(image1, image2, max_value=1.0):
     mse = torch.mean((image1-image2)**2)
     if mse.item() <= 1e-7:
-        return float('inf')
+        return mse.new_tensor(float('inf'))
     psnr = 20*torch.log10(max_value/torch.sqrt(mse))
     return psnr
 

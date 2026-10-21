@@ -1,0 +1,17 @@
+[2026/10/21 17:51:13] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/inputs/edges.png'
+[2026/10/21 17:51:13] ***********************************************
+[2026/10/21 17:51:13] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 17:51:13] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 17:51:13] Compression rate: 2.82x | 35.42%
+[2026/10/21 17:51:13] ***********************************************
+[2026/10/21 17:51:13] Initialized all 17 Gaussians from Laplacian partitions
+[2026/10/21 17:51:13] Step: 100 | Total: 0.44 s | Render: 0.13 s | Loss: 0.0016, L1: 0.0015, SSIM: 0.0001 | PSNR: 49.22 | SSIM: 0.9991
+[2026/10/21 17:51:13] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 17:51:13] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 17:51:13] Checkpoint 'ckpt_step-100.pt' successfully saved
+[2026/10/21 17:51:13] PSNR: 49.22 | SSIM: 0.9991 | LPIPS: nan | FLIP: 0.0384 | MS-SSIM: nan
+[2026/10/21 17:51:13] ***********************************************
+[2026/10/21 17:51:13] Optimization completed
+[2026/10/21 17:51:13] ***********************************************
+[2026/10/21 17:51:13] Mean scale: 1.3594 (pixel) | 1.0300 (raw)
+[2026/10/21 17:51:13] ***********************************************

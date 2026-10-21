@@ -1,0 +1,20 @@
+[2026/10/21 17:51:27] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/inputs/edges.png'
+[2026/10/21 17:51:27] ***********************************************
+[2026/10/21 17:51:27] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 17:51:27] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 17:51:27] Compression rate: 2.82x | 35.42%
+[2026/10/21 17:51:27] ***********************************************
+[2026/10/21 17:51:27] Initialized all 17 Gaussians from Laplacian partitions
+[2026/10/21 17:51:27] Fixed-geometry unquantized L2 color fit: MSE 0.00261707 -> 0.000375497
+[2026/10/21 17:51:28] Step: 100 | Total: 0.41 s | Render: 0.12 s | Loss: 0.0014, L1: 0.0013, SSIM: 0.0001 | PSNR: 50.29 | SSIM: 0.9989
+[2026/10/21 17:51:28] Step: 200 | Total: 0.83 s | Render: 0.24 s | Loss: 0.0008, L1: 0.0008, SSIM: 0.0000 | PSNR: 54.76 | SSIM: 0.9995
+[2026/10/21 17:51:29] Step: 300 | Total: 1.25 s | Render: 0.36 s | Loss: 0.0007, L1: 0.0007, SSIM: 0.0000 | PSNR: 57.82 | SSIM: 0.9997
+[2026/10/21 17:51:29] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 17:51:29] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 17:51:29] Checkpoint 'ckpt_step-300.pt' successfully saved
+[2026/10/21 17:51:29] PSNR: 57.82 | SSIM: 0.9997 | LPIPS: nan | FLIP: 0.0194 | MS-SSIM: nan
+[2026/10/21 17:51:29] ***********************************************
+[2026/10/21 17:51:29] Optimization completed
+[2026/10/21 17:51:29] ***********************************************
+[2026/10/21 17:51:29] Mean scale: 1.4582 (pixel) | 0.9809 (raw)
+[2026/10/21 17:51:29] ***********************************************

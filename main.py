@@ -23,6 +23,14 @@ def get_gaussian_cfg(args):
     if not args.disable_topk_norm:
         gaussian_cfg += f"_top-{args.topk:d}"
     gaussian_cfg += f"_{args.init_mode[0]}-{args.init_random_ratio:.1f}"
+    if args.init_mode == 'laplacian':
+        gaussian_cfg += (f"_lap-{args.laplacian_smoothing:g}-{args.activity_epsilon:g}"
+                         f"-{args.activity_alpha:g}-{args.activity_beta:g}_{args.partition_strategy}"
+                         f"_cal-{args.partition_scale_factor:g}-{args.partition_min_scale:g}")
+    if getattr(args, 'color_fit_sweeps', 0):
+        gaussian_cfg += f"_fit-{args.color_fit_sweeps}"
+    if getattr(args, 'residual_refine_count', 0):
+        gaussian_cfg += f"_refine-{args.residual_refine_count}"
     return gaussian_cfg
 
 
@@ -34,7 +42,7 @@ def get_log_dir(args):
         folder += f"_ds-{args.downsample_ratio:.1f}"
     if not args.disable_lr_schedule:
         folder += f"_decay-{args.max_decay_times:d}-{args.decay_ratio:.1f}"
-    if not args.disable_prog_optim:
+    if not args.disable_prog_optim and args.init_mode != "laplacian" and not args.skip_adam and args.max_steps > 0:
         folder += "_prog"
     return f"{args.log_root}/{args.exp_name}/{folder}"
 

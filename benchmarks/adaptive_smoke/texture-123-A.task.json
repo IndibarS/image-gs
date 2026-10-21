@@ -1,0 +1,1 @@
+{"image": "/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/inputs/texture.png", "run_dir": "/home/indibar/Documents/projects/image-gs/benchmarks/adaptive_smoke/texture-123-A", "mode": "A", "seed": 123, "gaussians": 17, "bits": 16, "device": "cpu", "threads": 2}

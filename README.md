@@ -46,7 +46,43 @@
 
 ## Setup
 
-Image-GS uses **[uv](https://docs.astral.sh/uv/)** to manage Python and its dependencies. The supported research environment is **Linux x86_64, Python 3.11.10, PyTorch 2.4.1, and CUDA 12.4**. An NVIDIA GPU, matching driver, and CUDA development toolkit (including `nvcc`) are required to compile and run the custom rasterizer. This project does **not** currently have a CPU fallback.
+Image-GS uses **[uv](https://docs.astral.sh/uv/)** to manage Python and its dependencies. The supported research environment is **Linux x86_64, Python 3.11.10, PyTorch 2.4.1, and CUDA 12.4**. An NVIDIA GPU, matching driver, and CUDA development toolkit (including `nvcc`) are required to compile and run the custom rasterizer. A differentiable PyTorch CPU fallback supports optimization and rendering without NVIDIA hardware.
+
+For CPU execution and development on Linux x86_64:
+
+```bash
+uv sync
+uv run python main.py --input_path="img.jpg" --num_gaussians=10000 --quantize
+```
+
+The default `device: auto` uses the native CUDA backend when available and
+falls back to CPU when CUDA or its extensions are unavailable. Use
+`--device=cpu` to force CPU. Input paths are resolved under `--data_root`
+(default `media`), then relative to the current directory if not found there.
+CPU training is much slower; start with a small image and fewer Gaussians:
+
+```bash
+uv run python main.py --input_path="small.png" --num_gaussians=256 \
+  --max_steps=100 --disable_prog_optim --eval_steps=10 --quantize
+```
+
+`--disable_prog_optim` prevents the progressive schedule from increasing a
+short `--max_steps` run to its configured minimum. The CPU rasterizer uses
+tiles, bounded Gaussian batches, and recomputation during backpropagation to
+limit intermediate memory. It supports top-k normalization, unnormalized
+blending, no-tile rendering, quantization, and checkpoint evaluation. Numerical
+rounding and tied top-k selections may differ from CUDA; NVIDIA parity has not
+been validated on hardware.
+
+FLIP and saliency inference follow the selected device. Saliency initialization
+still needs the EMLNet weights described below. LPIPS needs pretrained AlexNet
+weights (downloaded on first use); if they cannot be downloaded, it is logged
+as unavailable (`NaN`) and the checkpoint is still saved. Small images also
+record unavailable LPIPS (<64 pixels) and MS-SSIM (<=160 pixels) as `NaN`.
+
+Run tests with `uv run python -m pytest -q tests`.
+
+For CUDA execution:
 
 1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and verify your CUDA toolchain (`nvcc --version` and `nvidia-smi`).
 2. Clone the repository and install the project dependencies:
@@ -55,22 +91,25 @@ Image-GS uses **[uv](https://docs.astral.sh/uv/)** to manage Python and its depe
     git clone https://github.com/IndibarS/image-gs.git
     cd image-gs
     uv python install 3.11.10
-    uv sync --locked --no-dev
+    uv sync --locked --extra cuda --no-dev
     ```
 
-    uv installs the pinned CUDA 12.4 PyTorch wheels and builds the local `gsplat` and Git-hosted `fused-ssim` extensions against the project environment. The first installation compiles CUDA code and requires a working C++/CUDA compiler. `uv lock` resolves dependency metadata without compiling CUDA code; a compatible NVIDIA system is still needed for `uv sync` and actual execution.
+    uv installs the pinned CUDA 12.4 PyTorch wheels and builds the local `gsplat` and Git-hosted `fused-ssim` extensions against the project environment. The first installation compiles CUDA code and requires a working C++/CUDA compiler. `uv lock` resolves dependency metadata without compiling CUDA code; a compatible NVIDIA system is still needed for `uv sync --extra cuda` and native CUDA execution.
 
 3. Confirm the CUDA runtime and custom modules:
 
     ```bash
-    uv run --locked --no-dev python -c "import torch, gsplat, fused_ssim; print(torch.__version__, torch.cuda.is_available())"
+    uv run --locked --extra cuda --no-dev python -c "import torch, gsplat, fused_ssim; print(torch.__version__, torch.cuda.is_available())"
     ```
 
 4. Download the image and texture datasets from [OneDrive](https://1drv.ms/u/c/3a8968df8a027819/EeshjZJlMtdCmvvmESiN2pABM71EDaoLYmEwuOvecg0tAA?e=GybqBv) and place them under `media/images` and `media/textures`.
 
 5. (Optional) For saliency-guided initialization, download the pretrained [EML-Net](https://github.com/SenJia/EML-NET-Saliency) models ([res_imagenet.pth](https://drive.google.com/open?id=1-a494canr9qWKLdm-DUDMgbGwtlAJz71), [res_places.pth](https://drive.google.com/open?id=18nRz0JSRICLqnLQtAvq01azZAsH0SEzS), [res_decoder.pth](https://drive.google.com/open?id=1vwrkz3eX-AMtXQE08oivGMwS4lKB74sH)) and put them in `models/emlnet/`.
 
-Commands in the examples below use `python main.py`; after uv setup, run them as **`uv run --no-dev python main.py ...`** instead. See [CONTRIBUTING.md](CONTRIBUTING.md) for development, dependency updates, and troubleshooting.
+Always include `--extra cuda` in `uv run` for CUDA work; plain `uv sync` switches
+back to the core environment and removes optional extensions.
+
+Commands in the examples below use `python main.py`; after uv setup, run them as **`uv run --extra cuda --no-dev python main.py ...`** instead. See [CONTRIBUTING.md](CONTRIBUTING.md) for development, dependency updates, and troubleshooting.
 
 ## Quick Start
 
@@ -167,3 +206,128 @@ If you find this project helpful to your research, please consider citing [BibTe
   year={2025}
 }
 ```
+
+## Laplacian-guided adaptive initialization
+
+`--init_mode=laplacian` calculates Gaussian geometry from image structure on CPU,
+then optionally fits colors or refines all parameters with Adam on the selected
+CPU/CUDA backend. It always initializes the **full requested Gaussian budget**.
+It does not silently expand a requested 100- or 300-step experiment to satisfy
+the original progressive schedule. Existing random, gradient, and saliency modes
+retain their default progressive behavior. `--max_steps=0` or `--skip_adam`
+initializes the full budget in any mode and still renders, evaluates, and saves.
+
+```bash
+# Original gradient baseline (exactly 10,000 steps: disable early stopping)
+uv run python main.py --input_path=img.jpg --exp_name=compare/baseline \
+  --init_mode=gradient --num_gaussians=1000 --max_steps=10000 --disable_lr_schedule --quantize
+
+# Direct image-derived geometry and regional colors, no Adam
+uv run python main.py --input_path=img.jpg --exp_name=compare/laplacian0 \
+  --init_mode=laplacian --num_gaussians=1000 --max_steps=0 --partition_visualize --quantize
+
+# Full initialization followed by a short Adam refinement
+uv run python main.py --input_path=img.jpg --exp_name=compare/laplacian300 \
+  --init_mode=laplacian --num_gaussians=1000 --max_steps=300 --disable_lr_schedule --quantize
+
+# Fixed-geometry sparse L2 color fitting, no Adam
+uv run python main.py --input_path=img.jpg --exp_name=compare/fitted0 \
+  --init_mode=laplacian --num_gaussians=1000 --color_fit_sweeps=5 --skip_adam --quantize
+
+# Optional residual replacement/refit ablation (preserves total count)
+uv run python main.py --input_path=img.jpg --exp_name=compare/residual \
+  --init_mode=laplacian --num_gaussians=1000 --color_fit_sweeps=5 \
+  --residual_refine_count=4 --residual_refine_sweeps=2 --skip_adam --quantize
+```
+
+For native NVIDIA execution add `--extra cuda` to `uv run`. Use smaller images
+for CPU experiments; this initializer does not make a large Adam step cheap.
+Choose separate `--exp_name` values for experiments: existing training behavior
+clears the output directory for a repeated name/configuration. Use the same
+settings and `--eval` to load a saved representation; initialization/fitting are
+not repeated during checkpoint evaluation.
+
+### Algorithm and controls
+
+All options below are also defaults in `cfgs/default.yaml` and CLI arguments.
+
+| Option | Default | Meaning |
+|---|---:|---|
+| `laplacian_smoothing` | 0.8 | Spatial Gaussian prefilter sigma in pixels; 0 disables it |
+| `activity_epsilon` | 0.05 | Uniform activity floor relative to mean-normalized derivatives |
+| `activity_alpha` | 0 | Gradient magnitude weight; 0 gives pure Laplacian activity |
+| `activity_beta` | 1 | Absolute Laplacian weight |
+| `partition_strategy` | balanced | `balanced` trades mass accuracy against shape; `longest` prefers longest-axis cuts |
+| `partition_scale_factor` | 1.5 | Multiplier on covariance-derived pixel standard deviations |
+| `partition_min_scale` | 0.35 | Minimum physical scale in pixels |
+| `partition_visualize` | false | Save `partition.png` showing initial region boundaries |
+| `color_fit_sweeps` | 0 | Optional cyclic L2 coordinate-descent sweeps |
+| `color_fit_epsilon` | 1e-10 | Stabilizer for color-fit denominators |
+| `color_fit_max_entries` | 20,000,000 | Maximum estimated sparse pixel/contributor entries; fail clearly if exceeded |
+| `skip_adam` | false | Fit/initialize and save without Adam |
+| `residual_refine_count` | 0 | Replace up to 32 low-impact Gaussians in one optional batch |
+| `residual_refine_sweeps` | 2 | Fit colors sharing affected pixels after replacement |
+
+Derivatives are calculated **per channel**, then absolute Laplacian / gradient
+magnitudes are averaged across channels and normalized by spatial mean. This
+preserves equal-luminance chromatic edges. Constant images use uniform activity;
+noise sensitivity is controlled by smoothing. Texture stacks use all channels.
+The analysis uses the loaded, gamma-transformed optimization target.
+
+An integral image supports budget-aware binary cuts near the target child mass.
+The partition has exactly N nonempty, nonoverlapping regions covering the image.
+Pixel capacity constrains child budgets; mass balance and aspect ratio cannot both
+be exact near strong impulses or for tiny regions. Requests exceeding the pixel
+count raise a clear error rather than duplicating regions. No K-means or global
+pixel-to-Gaussian distance matrix is used. Partitioning is deterministic without
+random sampling, so different seeds produce the same adaptive geometry.
+
+Each region supplies an activity-weighted centroid/covariance and a regional mean
+feature vector. Pixel footprint variance stabilizes single-pixel regions; physical
+scales are clamped positive and isotropic orientation is fixed to zero. Coordinates
+are divided by image width/height, rotations use gsplat's clockwise convention,
+and physical scales are inverted when inverse-scale storage is enabled.
+`disable_color_init` retains its old meaning in legacy modes; Laplacian mode always
+uses regional colors because it is a direct initializer.
+
+### Sparse fitting and residual refinement
+
+The optional color solver freezes geometry, extracts the CPU renderer's actual
+normalized top-K weights, and stores W in sparse form with O(pixels × K) entries.
+Contributor selection and normalization are shared with the CPU renderer.
+Projection and quantization use the active model's conventions. Before solving,
+`W @ C` is compared against the active renderer; a mismatch (for example native
+CUDA tie handling) raises an error recommending `--device=cpu`, rather than
+silently solving an inaccurate model. Native CUDA parity is not hardware-verified.
+Unnormalized tiled blending is currently unsupported by this optional solver and
+is explicitly rejected. Normal rendering/Adam still supports it.
+
+Cyclic coordinate descent updates all feature channels together and immediately
+updates the residual after each column. This minimizes **unquantized squared
+error for fixed geometry**, not L1 + SSIM. Quantization, clamping, gamma correction,
+and later geometry updates may change the resulting quality. Final reported
+metrics are measured after the existing quantization/save path. Zero-weight
+columns are left unchanged. Sparse storage is bounded explicitly; full-resolution
+images can require hundreds of MB, and extraction currently checks Gaussian tile
+bounds per tile. It is not a constant-memory streaming solver.
+
+Optional residual refinement replaces a bounded batch of low-contribution
+Gaussians at separated high-error pixels, rebuilds membership once, and fits only
+colors sharing affected pixels. It accepts the batch only if actual rendered MSE
+improves, otherwise restores the original tensors. The total Gaussian budget is
+unchanged. This stage still needs a full sparse membership rebuild and validation
+render; it is disabled by default and timed separately.
+
+### Measurements
+
+Every completed training run writes `encoding_metrics.json` with initialization,
+color-fitting, residual refinement, Adam, and total encoding wall times plus final
+quality and size accounting. Timing on CUDA is synchronized. Parameter payload
+bytes are an estimated packed bit budget; the `.pt` file is a larger training
+checkpoint, not a newly implemented compressed bitstream.
+
+See [benchmarks/README.md](benchmarks/README.md) and
+`scripts/benchmark_adaptive.py` for the reproducible six-mode comparison (baseline
+10,000 steps; adaptive 0/100/300; fitted adaptive 0/300), JSON/CSV exports, isolated
+process peak-memory measurements, and the interpretation limits of small tests.
+No quality-equivalent speedup is assumed.

@@ -1,0 +1,18 @@
+[2026/10/21 18:04:37] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/edges.png'
+[2026/10/21 18:04:37] ***********************************************
+[2026/10/21 18:04:37] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:04:37] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:04:37] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:04:37] ***********************************************
+[2026/10/21 18:04:37] Image gradient map successfully saved
+[2026/10/21 18:04:37] ***********************************************
+[2026/10/21 18:04:38] Step: 100 | Total: 0.41 s | Render: 0.12 s | Loss: 0.0488, L1: 0.0343, SSIM: 0.0145 | PSNR: 21.16 | SSIM: 0.8540
+[2026/10/21 18:04:38] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:04:38] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:04:38] Checkpoint 'ckpt_step-100.pt' successfully saved
+[2026/10/21 18:04:38] PSNR: 21.16 | SSIM: 0.8541 | LPIPS: nan | FLIP: 0.2195 | MS-SSIM: nan
+[2026/10/21 18:04:38] ***********************************************
+[2026/10/21 18:04:38] Optimization completed
+[2026/10/21 18:04:38] ***********************************************
+[2026/10/21 18:04:38] Mean scale: 11.3093 (pixel) | 0.2273 (raw)
+[2026/10/21 18:04:38] ***********************************************

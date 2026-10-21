@@ -1,0 +1,18 @@
+[2026/10/21 18:07:45] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/texture.png'
+[2026/10/21 18:07:45] ***********************************************
+[2026/10/21 18:07:45] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:07:45] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:07:45] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:07:45] ***********************************************
+[2026/10/21 18:07:45] Image gradient map successfully saved
+[2026/10/21 18:07:45] ***********************************************
+[2026/10/21 18:07:45] Step: 100 | Total: 0.47 s | Render: 0.14 s | Loss: 0.5637, L1: 0.4816, SSIM: 0.0821 | PSNR: 4.98 | SSIM: 0.1791
+[2026/10/21 18:07:45] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:07:45] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:07:45] Checkpoint 'ckpt_step-100.pt' successfully saved
+[2026/10/21 18:07:45] PSNR: 4.98 | SSIM: 0.1791 | LPIPS: nan | FLIP: 0.7741 | MS-SSIM: nan
+[2026/10/21 18:07:45] ***********************************************
+[2026/10/21 18:07:45] Optimization completed
+[2026/10/21 18:07:45] ***********************************************
+[2026/10/21 18:07:45] Mean scale: 6.2860 (pixel) | 0.2108 (raw)
+[2026/10/21 18:07:45] ***********************************************

@@ -1,0 +1,17 @@
+[2026/10/21 18:09:18] Start optimizing 17 Gaussians for '/home/indibar/Documents/projects/image-gs/benchmarks/initialization_step_sweep/inputs/texture.png'
+[2026/10/21 18:09:18] ***********************************************
+[2026/10/21 18:09:18] Uncompressed: 0.77 KB | 24.000 bpp | 8.000 bppc
+[2026/10/21 18:09:18] Compressed: 0.27 KB | 8.500 bpp | 2.833 bppc
+[2026/10/21 18:09:18] Compression rate: 2.82x | 35.42%
+[2026/10/21 18:09:18] ***********************************************
+[2026/10/21 18:09:18] Initialized all 17 Gaussians from Laplacian partitions
+[2026/10/21 18:09:18] Step: 100 | Total: 0.41 s | Render: 0.12 s | Loss: 0.5455, L1: 0.4654, SSIM: 0.0801 | PSNR: 4.50 | SSIM: 0.2013
+[2026/10/21 18:09:18] MS-SSIM requires both image dimensions >160; recording NaN.
+[2026/10/21 18:09:18] LPIPS skipped for images smaller than 64 pixels; recording NaN.
+[2026/10/21 18:09:18] Checkpoint 'ckpt_step-100.pt' successfully saved
+[2026/10/21 18:09:18] PSNR: 4.50 | SSIM: 0.2013 | LPIPS: nan | FLIP: 0.8011 | MS-SSIM: nan
+[2026/10/21 18:09:18] ***********************************************
+[2026/10/21 18:09:18] Optimization completed
+[2026/10/21 18:09:18] ***********************************************
+[2026/10/21 18:09:18] Mean scale: 1.4773 (pixel) | 0.7704 (raw)
+[2026/10/21 18:09:18] ***********************************************
